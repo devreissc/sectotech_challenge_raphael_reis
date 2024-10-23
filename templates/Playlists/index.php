@@ -24,8 +24,7 @@
                     <td><?= h($playlist->created_at) ?></td>
                     <td><?= h($playlist->updated_at) ?></td>
                     <td class="actions">
-                        <button class="btn btn-sm view-playlist" data-playlist-id="<?= $playlist->id ?>">Visualizar</button>
-                        <?= $this->Html->link(__('Visualizar'), ['action' => 'view', $playlist->id]) ?>
+                        <button class="view-playlist" data-playlist-id="<?= $playlist->id ?>">Visualizar</button>
                         <button class="edit-playlist" data-playlist-id="<?= $playlist->id ?>">Editar</button>
                         <?= $this->Form->postLink(__('Excluir'), ['action' => 'delete', $playlist->id], ['confirm' => __('Are you sure you want to delete # {0}?', $playlist->id)]) ?>
                     </td>
