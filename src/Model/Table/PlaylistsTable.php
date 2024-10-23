@@ -90,6 +90,24 @@ class PlaylistsTable extends Table
         return $this->find();
     }
 
+    public function getAllPlaylistsAjax(){
+        $playlists = $this->find()->toArray();
+
+        if(!empty($playlists)){
+            return [
+                'success' => true,
+                'message' => 'Playlists encontradas.',
+                'data' => $playlists
+            ];
+        }else{
+            return [
+                'success' => false,
+                'message' => 'Não foram encontradas playlists.'
+            ];
+        }
+    }
+
+
     // Adiciona Playlist
     public function addPlaylist($data = []){
         $playlist = $this->newEmptyEntity();

@@ -1,48 +1,7 @@
 <div class="playlists index content">
     <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Playlists') ?></h3>
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th><?= $this->Paginator->sort('id') ?></th>
-                    <th><?= $this->Paginator->sort('title') ?></th>
-                    <th><?= $this->Paginator->sort('description') ?></th>
-                    <th><?= $this->Paginator->sort('author') ?></th>
-                    <th><?= $this->Paginator->sort('created_at') ?></th>
-                    <th><?= $this->Paginator->sort('updated_at') ?></th>
-                    <th class="actions"><?= __('Actions') ?></th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($playlists as $playlist): ?>
-                <tr>
-                    <td><?= $this->Number->format($playlist->id) ?></td>
-                    <td class="playlist-title"><?= h($playlist->title) ?></td>
-                    <td><?= h($playlist->description) ?></td>
-                    <td><?= h($playlist->author) ?></td>
-                    <td><?= h($playlist->created_at) ?></td>
-                    <td><?= h($playlist->updated_at) ?></td>
-                    <td class="actions">
-                        <button class="view-playlist" data-playlist-id="<?= $playlist->id ?>">Visualizar</button>
-                        <button class="edit-playlist" data-playlist-id="<?= $playlist->id ?>">Editar</button>
-                        <?= $this->Form->postLink(__('Excluir'), ['action' => 'delete', $playlist->id], ['confirm' => __('Are you sure you want to delete # {0}?', $playlist->id)]) ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-    <div class="paginator">
-        <ul class="pagination">
-            <?= $this->Paginator->first('<< ' . __('first')) ?>
-            <?= $this->Paginator->prev('< ' . __('previous')) ?>
-            <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('next') . ' >') ?>
-            <?= $this->Paginator->last(__('last') . ' >>') ?>
-        </ul>
-        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
-    </div>
+    <div id="tabela-playlists"></div>
 </div>
 
 <script>
@@ -50,6 +9,38 @@
         var PlaylistIndex = {
             init: function(){
                 PlaylistIndex.utilitarios();
+                PlaylistIndex.getAllPlaylists();
+            },
+            getAllPlaylists: function(){
+                $.ajax({
+                    url: '<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'getAllPlaylists']);?>',
+                    type: "GET",
+                    dataType: "json",
+                    beforeSend: function () {
+                        alert('carregando...');
+                    },
+                    success: function (response) {
+                        if(response.success){
+                            // Cria o HTML para exibir as playlists
+                            var html = '<table>';
+                            html += '<tr><th>ID</th><th>Title</th></tr>';
+                            response.data.forEach(function(playlist) {
+                                html += '<tr>';
+                                html += '<td>' + playlist.id + '</td>';
+                                html += '<td>' + playlist.title + '</td>';
+                                html += '</tr>';
+                            });
+                            html += '</table>';
+
+                            // Insere o HTML gerado na div
+                            $('#tabela-playlists').html(html);
+                        }else {
+                            alert(response.message);
+                            $('#tabela-playlists').html('<p>Nenhuma playlist encontrada.</p>');
+                        }
+                        console.log(response);
+                    }
+                });
             },
             utilitarios: function(){
                 $('.view-playlist').unbind().click(function(){

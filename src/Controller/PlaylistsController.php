@@ -7,10 +7,17 @@ class PlaylistsController extends AppController
 {
     public function index()
     {
-        $query = $this->Playlists->getAllPlaylists();
-        $playlists = $this->paginate($query);
+        // $query = $this->Playlists->getAllPlaylists();
+        // $playlists = $this->paginate($query);
 
-        $this->set(compact('playlists'));
+        // $this->set(compact('playlists'));
+    }
+
+    public function getAllPlaylists(){
+        $this->autoRender = false; // Desativa o auto render
+        $this->viewBuilder()->setLayout('ajax');
+        $playlists = $this->Playlists->getAllPlaylistsAjax();
+        return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
     }
 
     public function view($id = null)
