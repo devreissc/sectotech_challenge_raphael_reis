@@ -5,9 +5,8 @@ namespace App\Controller;
 
 class PlaylistsController extends AppController
 {
-    public function index()
+    public function index($page = 1)
     {
-        //Função apenas para iniciar a view
     }
 
     public function getAllPlaylists($page = 1){
@@ -55,18 +54,24 @@ class PlaylistsController extends AppController
         }
     }
 
-    public function delete($id = null)
+    public function delete()
     {
+        $this->autoRender = false;
         $this->request->allowMethod(['post', 'delete']);
+        $id = $this->request->getData('id');
         $playlist = $this->Playlists->get($id);
 
         if ($this->Playlists->delete($playlist)) {
-            $this->Flash->success(__('The playlist has been deleted.'));
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => true,
+                'message' => 'Playlist excluída com sucesso'
+            ]));
         } else {
-            $this->Flash->error(__('The playlist could not be deleted. Please, try again.'));
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => false,
+                'message' => 'Erro ao excluir Playlist, por favor, recarregue a página e tente novamente'
+            ]));
         }
-
-        return $this->redirect(['action' => 'index']);
     }
 
     public function getPlaylist($id = null){
