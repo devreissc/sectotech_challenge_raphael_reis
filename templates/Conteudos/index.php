@@ -27,7 +27,6 @@
                     beforeSend: function () {
                     },
                     success: function(response){
-                        console.log(response);
                         if(response.success){
                             var html = '<table>';
                             html += '<tr><th>ID</th><th>Playlist</th><th>Título</th><th>URL</th><th>Autor</th><th>Data de criação</th><th>Última atualização</th><th>Ações</th></tr>';
@@ -91,7 +90,6 @@
                         method: 'GET',
                         dataType: 'json',
                         success: function(response){
-                            console.log(response);
                             $('#conteudo-id').val(response.data.id);
                             $('#conteudo-title').val(response.data.title);
                             $('#conteudo-url').val(response.data.url);
@@ -100,7 +98,7 @@
                             $('#crudConteudoModal').modal('show');
                         },
                         error: function() {
-                            ConteudosIndex.showErrorMessage('Erro', 'Erro ao editar a Conteúdo.');
+                            GlobalScript.showErrorMessage('Erro', 'Erro ao editar a Conteúdo.');
                         }
                     });
                 });
@@ -138,14 +136,14 @@
                             if(response.success){
                                 window.location.href = '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'view']) ?>/' + conteudoId;
                             }else{
-                                ConteudosIndex.showErrorMessage('Erro', 'Erro ao atualizar o conteúdo.');
+                                GlobalScript.showErrorMessage('Erro', 'Erro ao atualizar o conteúdo.');
                             }
                         },
                         error: function(jqXHR) {
                             if (jqXHR.status === 404) {
-                                ConteudosIndex.showErrorMessage('Erro', 'Conteúdo não encontrado.');
+                                GlobalScript.showErrorMessage('Erro', 'Conteúdo não encontrado.');
                             } else {
-                                ConteudosIndex.showErrorMessage('Erro', 'Erro ao carregar o conteúdo.');
+                                GlobalScript.showErrorMessage('Erro', 'Erro ao carregar o conteúdo.');
                             }
                         }
                     });
@@ -163,7 +161,7 @@
                     if (result.isConfirmed) {
                         ConteudosIndex.requestOperation(url, data);
                     } else if (result.isDenied) {
-                        ConteudosIndex.showInfoMessage("Operação cancelada");
+                        GlobalScript.showInfoMessage("Operação cancelada");
                     }
                 });
             },
@@ -177,27 +175,18 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            ConteudosIndex.showSuccessMessage('Sucesso!', response.message);
+                            GlobalScript.showSuccessMessage('Sucesso!', response.message);
                         } else {
-                            ConteudosIndex.showErrorMessage('Erro!', response.message);
+                            GlobalScript.showErrorMessage('Erro!', response.message);
                         }
                         ConteudosIndex.reloadConteudos();
                     },
                     error: function() {
-                        ConteudosIndex.showErrorMessage('Erro!', 'Erro na requisição.');
+                        GlobalScript.showErrorMessage('Erro!', 'Erro na requisição.');
                     }
                 });
 
                 $('#crudConteudoModal').modal('hide');
-            },
-            showSuccessMessage: function(title, message) {
-                Swal.fire(title, message, 'success');
-            },
-            showErrorMessage: function(title, message) {
-                Swal.fire(title, message, 'error');
-            },
-            showInfoMessage: function(message) {
-                Swal.fire('Informação', message, 'info');
             },
             reloadConteudos: function() {
                 setTimeout(function() {

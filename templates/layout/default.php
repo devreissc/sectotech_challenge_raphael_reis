@@ -45,7 +45,8 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <?= $this->Html->script(
         [
             'bootstrap5/js/bootstrap.bundle',
-            'bootstrap5/js/bootstrap.min'
+            'bootstrap5/js/bootstrap.min',
+            'global'
         ]
     ) ?>
 

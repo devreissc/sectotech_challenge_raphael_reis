@@ -25,3 +25,4 @@
 /vendors/*
 /tmp
 tmp/debug_kit.sqlite
+*.sqlite
