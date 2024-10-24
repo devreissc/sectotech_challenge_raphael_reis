@@ -100,13 +100,36 @@ class PlaylistsTable extends Table
         $playlist = $this->patchEntity($playlist, $data);
         
         if ($this->save($playlist)) {
-            return $playlist;
+            return [
+                'success' => true,
+                'data' => $playlist,
+                'message' => 'Playlist adicionada com sucesso'
+            ];
         }else{
-            return null;
+            return [
+                'success' => false,
+                'message' => 'Erro ao adicionar a playlist, por favor, recarregue a página e tente novamente'
+            ];
         }
     }
 
-    public function edit($id = null, $data = []){
+    public function deletePlaylist(int $id){
+        $playlist = $this->get($id);
+
+        if($this->delete($playlist)){
+            return [
+                'success' => true,
+                'message' => 'Playlist excluída com sucesso'
+            ];
+        }else{
+            return [
+                'success' => false,
+                'message' => 'Erro ao excluir a playlist, por favor, recarregue a página e tente novamente'
+            ];
+        }
+    }
+
+    public function editPlaylist($id = null, $data = []){
         if(is_null($id) || empty($data)){
             return [
                 'success' => false,

@@ -28,22 +28,12 @@ class PlaylistsController extends AppController
 
     public function add()
     {
-        $playlist = $this->Playlists->newEmptyEntity();
+        $this->autoRender = false;
+        $this->request->allowMethod(['post']);
 
-        if ($this->request->is('post')) 
-        {
-            $playlist = $this->Playlists->addPlaylist($this->request->getData());
+        $response = $this->Playlists->addPlaylist($this->request->getData());
 
-            if ($playlist) 
-            {
-                $this->Flash->success(__('Playlist criada com sucesso.'));
-                return $this->redirect(['action' => 'index']);
-            }
-
-            $this->Flash->error(__('Erro ao criar a playlist. Por favor, tente novamente.'));
-        }
-
-        $this->set(compact('playlist'));
+        return $this->response->withType('application/json')->withStringBody(json_encode($response));
     }
 
     public function edit($id = null)
@@ -52,7 +42,7 @@ class PlaylistsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $resultado = $this->Playlists->edit($id, $data);
+            $resultado = $this->Playlists->editPlaylist($id, $data);
             return $this->response->withType('application/json')->withStringBody(json_encode($resultado));
         }
     }
@@ -62,19 +52,10 @@ class PlaylistsController extends AppController
         $this->autoRender = false;
         $this->request->allowMethod(['post', 'delete']);
         $id = $this->request->getData('id');
-        $playlist = $this->Playlists->get($id);
+        $response = $this->Playlists->deletePlaylist((int)$id);
 
-        if ($this->Playlists->delete($playlist)) {
-            return $this->response->withType('application/json')->withStringBody(json_encode([
-                'success' => true,
-                'message' => 'Playlist excluída com sucesso'
-            ]));
-        } else {
-            return $this->response->withType('application/json')->withStringBody(json_encode([
-                'success' => false,
-                'message' => 'Erro ao excluir Playlist, por favor, recarregue a página e tente novamente'
-            ]));
-        }
+        // Retorna a resposta com JSON
+        return $this->response->withType('application/json')->withStringBody(json_encode($response));
     }
 
     public function getPlaylist($id = null){

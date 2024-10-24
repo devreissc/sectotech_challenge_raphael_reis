@@ -1,5 +1,5 @@
 <div class="playlists index content">
-    <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
+<a href="javascript:;" id="add-playlist" class="button float-right"><?= __('Nova Playlist') ?></a>
     <h3><?= __('Playlists') ?></h3>
     
     <div id="tabela-playlists"></div>
@@ -67,6 +67,55 @@
                 });
             },
             utilitarios: function(){
+                $('#add-playlist').off('click').on('click', function(event){
+                    event.preventDefault();
+                    $('#crudPlaylistModal').modal('show');
+                });
+
+                $('.edit-playlist').unbind().click(function(){
+                    var playlistId = $(this).data('playlist-id');
+
+                    $.ajax({
+                        url: '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'getPlaylist']) ?>/'+playlistId,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function(response){
+                            $('#playlist-id').val(response.data.id);
+                            $('#playlist-title').val(response.data.title);
+                            $('#playlist-description').val(response.data.description);
+                            $('#playlist-author').val(response.data.author);
+                            $('#crudPlaylistModal').modal('show');
+                        },
+                        error: function() {
+                            GlobalScript.showErrorMessage('Erro', 'Erro ao editar a Playlist.');
+                        }
+                    });
+                });
+
+                $('#savePlaylistChanges').off('click').on('click', function(event){
+                    event.preventDefault();
+
+                    var id = $('#playlist-id').val();
+                    var urlRequest = '<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'add']) ?>';
+                    var message = 'Tem certeza que deseja salvar essa playlist?';
+
+                    if(id){
+                        urlRequest = '<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'edit']) ?>/'+id;
+                        message = 'Tem certeza que deseja salvar as alterações?';
+                    }
+
+                    var dataPlaylist = $('#crudPlaylistForm').serialize();
+
+                    PlaylistIndex.confirmOperation(message, urlRequest, dataPlaylist);
+                });
+
+                $('.delete-playlist').unbind().click(function(){
+                    var playlistId = $(this).data('playlist-id');
+                    var urlRequest = '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'delete']) ?>';
+
+                    PlaylistIndex.confirmOperation('Tem certeza que deseja excluir esse registro?', urlRequest, {id: playlistId});
+                });
+
                 $('.pagination-link').off('click').on('click', function(event){
                     event.preventDefault(); // Evita o comportamento padrão do link
                     var clickedPage = $(this).data('page');
@@ -76,6 +125,7 @@
 
                     PlaylistIndex.getAllPlaylists(clickedPage); // Chama a função para carregar a página selecionada
                 });
+
                 $('.view-playlist').unbind().click(function(){
                     var playlistId = $(this).data('playlist-id');
                     $.ajax({
@@ -86,75 +136,20 @@
                             if(response.success){
                                 window.location.href = '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'view']) ?>/' + playlistId;
                             }else{
-                                PlaylistIndex.showErrorMessage('Erro', 'Erro ao atualizar playlist.');
+                                GlobalScript.showErrorMessage('Erro', 'Erro ao atualizar playlist.');
                             }
                         },
                         error: function(jqXHR) {
                             if (jqXHR.status === 404) {
-                                PlaylistIndex.showErrorMessage('Erro', 'Playlist não encontrada.');
+                                GlobalScript.showErrorMessage('Erro', 'Playlist não encontrada.');
                             } else {
-                                PlaylistIndex.showErrorMessage('Erro', 'Erro ao carregar playlist.');
+                                GlobalScript.showErrorMessage('Erro', 'Erro ao carregar playlist.');
                             }
-                        }
-                    });
-                });
-                
-                $('.edit-playlist').unbind().click(function(){
-                    var playlistId = $(this).data('playlist-id');
-
-                    $.ajax({
-                        url: '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'getPlaylist']) ?>/'+playlistId,
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function(response){
-                            console.log(response);
-                            $('#playlist-id').val(response.data.id);
-                            $('#playlist-title').val(response.data.title);
-                            $('#playlist-description').val(response.data.description);
-                            $('#playlist-author').val(response.data.author);
-                            $('#editPlaylistModal').modal('show');
-                        },
-                        error: function() {
-                            PlaylistIndex.showErrorMessage('Erro', 'Erro ao editar a Playlist.');
-                        }
-                    });
-                });
-
-                $('.delete-playlist').unbind().click(function(){
-                    var playlistId = $(this).data('playlist-id');
-                    var urlRequest = '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'delete']) ?>';
-
-                    PlaylistIndex.confirmDeleteOrUpdate('Tem certeza que deseja excluir esse registro?', urlRequest, playlistId);
-                });
-
-                $('#savePlaylistChanges').unbind().click(function(){
-                    var dataPlaylist = $('#editPlaylistForm').serialize();
-
-                    $.ajax({
-                        url: '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'edit']) ?>/' + $('#playlist-id').val(),
-                        type: 'post',
-                        data: dataPlaylist,
-                        dateType: 'json',
-                        headers: {
-                            'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) { 
-                                PlaylistIndex.showSuccessMessage('Sucesso!', 'Playlist atualizada.');
-                            } else {
-                                PlaylistIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
-                            }
-
-                            $('#editPlaylistModal').modal('hide');
-                            PlaylistIndex.reloadPlaylists();
-                        },
-                        error: function() {
-                            PlaylistIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
                         }
                     });
                 });
             },
-            confirmDeleteOrUpdate: function(modalTitle = '', url = '', data = []){
+            confirmOperation: function(modalTitle = '', url = '', data = []){
                 Swal.fire({
                     title: modalTitle,
                     showDenyButton: true,
@@ -164,41 +159,34 @@
                     cancelButtonText: "Cancelar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        PlaylistIndex.requestDeleteOrUpdate(url, data);
+                        PlaylistIndex.requestOperation(url, data);
                     } else if (result.isDenied) {
-                        PlaylistIndex.showInfoMessage("Operação cancelada");
+                        GlobalScript.showInfoMessage("Operação cancelada");
                     }
                 });
             },
-            requestDeleteOrUpdate: function(url, data) {
+            requestOperation: function(url, dataPlaylist) {
                 $.ajax({
                     url: url,
                     type: 'POST',
-                    data: { id: data },
+                    data: dataPlaylist,
                     headers: {
                         'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
                     },
                     success: function(response) {
                         if (response.success) {
-                            PlaylistIndex.showSuccessMessage('Sucesso!', response.message);
+                            GlobalScript.showSuccessMessage('Sucesso!', response.message);
                         } else {
-                            PlaylistIndex.showErrorMessage('Erro!', response.message);
+                            GlobalScript.showErrorMessage('Erro!', response.message);
                         }
                         PlaylistIndex.reloadPlaylists();
                     },
                     error: function() {
-                        PlaylistIndex.showErrorMessage('Erro!', 'Erro na requisição.');
+                        GlobalScript.showErrorMessage('Erro!', 'Erro na requisição.');
                     }
                 });
-            },
-            showSuccessMessage: function(title, message) {
-                Swal.fire(title, message, 'success');
-            },
-            showErrorMessage: function(title, message) {
-                Swal.fire(title, message, 'error');
-            },
-            showInfoMessage: function(message) {
-                Swal.fire('Informação', message, 'info');
+
+                $('#crudPlaylistModal').modal('hide');
             },
             reloadPlaylists: function() {
                 setTimeout(function() {

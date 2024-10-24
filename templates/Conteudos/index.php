@@ -114,9 +114,9 @@
                         message = 'Tem certeza que deseja salvar as alterações?';
                     }
 
-                    var dataPlaylist = $('#crudConteudoForm').serialize();
+                    var dataConteudo = $('#crudConteudoForm').serialize();
 
-                    ConteudosIndex.confirmOperation(message, urlRequest, dataPlaylist);
+                    ConteudosIndex.confirmOperation(message, urlRequest, dataConteudo);
                 });
 
                 $('.delete-conteudo').unbind().click(function(){
@@ -165,11 +165,11 @@
                     }
                 });
             },
-            requestOperation: function(url, dataPlaylist) {
+            requestOperation: function(url, dataConteudo) {
                 $.ajax({
                     url: url,
                     type: 'POST',
-                    data: dataPlaylist,
+                    data: dataConteudo,
                     headers: {
                         'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
                     },
