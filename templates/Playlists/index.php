@@ -145,14 +145,7 @@
                             }
 
                             $('#editPlaylistModal').modal('hide');
-                            setTimeout(function() { 
-                                // Pegando o parâmetro "page" da URL
-                                const urlParams = new URLSearchParams(window.location.search);
-                                const paramsPage = urlParams.get('page') || 1;
-                                
-                                // Recarregar a lista de playlists
-                                PlaylistIndex.getAllPlaylists(paramsPage);
-                            }, 1000);
+                            PlaylistIndex.reloadPlaylists();
                         },
                         error: function() {
                             PlaylistIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
