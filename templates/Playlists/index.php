@@ -2,8 +2,12 @@
     <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Playlists') ?></h3>
     <div id="tabela-playlists"></div>
-    <div id="pagination-links">
-
+    <div>
+        <nav>
+            <ul class="pagination" id="pagination-links">
+                
+            </ul>
+        </nav>
     </div>
 </div>
 
@@ -52,7 +56,7 @@
                             var link = '';
                             // Cria links de paginação
                             for (var i = 1; i <= response.pagination.pages; i++) {
-                                link = '<a href="javascript:;" class="pagination-link" data-page="' + i + '">' + i + '</a>';
+                                link = '<li class="page-item ' + (response.pagination.current_page == i ? 'active' : '') + '"><a href="javascript:;" class="pagination-link page-link" data-page="' + i + '">' + i + '</a></li>';
                                 $('#pagination-links').append(link);
                             }
 
