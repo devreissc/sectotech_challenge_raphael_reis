@@ -2,20 +2,25 @@
     <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Playlists') ?></h3>
     <div id="tabela-playlists"></div>
+    <div id="pagination-links">
+
+    </div>
 </div>
 
 <script>
     $(document).ready(function(){
         var PlaylistIndex = {
             init: function(){
-                PlaylistIndex.utilitarios();
                 PlaylistIndex.getAllPlaylists();
             },
-            getAllPlaylists: function(){
+            getAllPlaylists: function(page = 1){
                 $.ajax({
-                    url: '<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'getAllPlaylists']);?>',
+                    url: '<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'getAllPlaylists']);?>/'+page,
                     type: "GET",
                     dataType: "json",
+                    data: {
+                        page: page
+                    },
                     beforeSend: function () {
                         alert('carregando...');
                     },
@@ -23,26 +28,53 @@
                         if(response.success){
                             // Cria o HTML para exibir as playlists
                             var html = '<table>';
-                            html += '<tr><th>ID</th><th>Title</th></tr>';
+                            html += '<tr><th>ID</th><th>Title</th><th>Autor</th><th>Descrição</th><th>Data de criação</th><th>Última atualização</th><th>Ações</th></tr>';
                             response.data.forEach(function(playlist) {
                                 html += '<tr>';
                                 html += '<td>' + playlist.id + '</td>';
                                 html += '<td>' + playlist.title + '</td>';
+                                html += '<td>' + playlist.author + '</td>';
+                                html += '<td>' + playlist.description + '</td>';
+                                html += '<td>' + playlist.created_at + '</td>';
+                                html += '<td>' + playlist.updated_at + '</td>';
+                                html += '<td><a href="javascript:;" class="btn btn-primary view-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Visualizar</a>'
+                                    + '<a href="javascript:;" class="btn btn-secondary edit-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Editar</a>'
+                                    + '<a href="javascript:;" class="btn btn-danger view-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Excluir</a>'
+                                    + '</td>';
                                 html += '</tr>';
                             });
                             html += '</table>';
 
                             // Insere o HTML gerado na div
                             $('#tabela-playlists').html(html);
+
+                            $('#pagination-links').empty();
+                            var link = '';
+                            // Cria links de paginação
+                            for (var i = 1; i <= response.pagination.pages; i++) {
+                                link = '<a href="javascript:;" class="pagination-link" data-page="' + i + '">' + i + '</a>';
+                                $('#pagination-links').append(link);
+                            }
+
+                            PlaylistIndex.utilitarios();
                         }else {
                             alert(response.message);
                             $('#tabela-playlists').html('<p>Nenhuma playlist encontrada.</p>');
+                            $('#pagination-links').empty();
                         }
                         console.log(response);
                     }
                 });
+
+                
             },
             utilitarios: function(){
+                $('.pagination-link').off('click').on('click', function(event){
+                    event.preventDefault(); // Evita o comportamento padrão do link
+                    var clickedPage = $(this).data('page');
+                    alert(clickedPage);
+                    PlaylistIndex.getAllPlaylists(clickedPage); // Chama a função para carregar a página selecionada
+                });
                 $('.view-playlist').unbind().click(function(){
                     var playlistId = $(this).data('playlist-id');
                     $.ajax({

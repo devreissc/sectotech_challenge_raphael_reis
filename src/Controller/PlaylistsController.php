@@ -7,16 +7,14 @@ class PlaylistsController extends AppController
 {
     public function index()
     {
-        // $query = $this->Playlists->getAllPlaylists();
-        // $playlists = $this->paginate($query);
-
-        // $this->set(compact('playlists'));
+        //Função apenas para iniciar a view
     }
 
-    public function getAllPlaylists(){
+    public function getAllPlaylists($page = 1){
         $this->autoRender = false; // Desativa o auto render
         $this->viewBuilder()->setLayout('ajax');
-        $playlists = $this->Playlists->getAllPlaylistsAjax();
+
+        $playlists = $this->Playlists->getAllPlaylistsAjax($page);
         return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
     }
 
@@ -25,7 +23,6 @@ class PlaylistsController extends AppController
         $playlist = $this->Playlists->get($id, contain: ['Conteudos']);
         $this->set(compact('playlist'));
     }
-
 
     public function add()
     {

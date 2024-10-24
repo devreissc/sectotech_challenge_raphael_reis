@@ -8,35 +8,9 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
-use function PHPUnit\Framework\isEmpty;
 
-/**
- * Playlists Model
- *
- * @property \App\Model\Table\ConteudosTable&\Cake\ORM\Association\HasMany $Conteudos
- *
- * @method \App\Model\Entity\Playlist newEmptyEntity()
- * @method \App\Model\Entity\Playlist newEntity(array $data, array $options = [])
- * @method array<\App\Model\Entity\Playlist> newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Playlist get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \App\Model\Entity\Playlist findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \App\Model\Entity\Playlist patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method array<\App\Model\Entity\Playlist> patchEntities(iterable $entities, array $data, array $options = [])
- * @method \App\Model\Entity\Playlist|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \App\Model\Entity\Playlist saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\App\Model\Entity\Playlist>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Playlist>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Playlist>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Playlist> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Playlist>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Playlist>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Playlist>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Playlist> deleteManyOrFail(iterable $entities, array $options = [])
- */
 class PlaylistsTable extends Table
 {
-    /**
-     * Initialize method
-     *
-     * @param array<string, mixed> $config The configuration for the Table.
-     * @return void
-     */
     public function initialize(array $config): void
     {
         parent::initialize($config);
@@ -90,14 +64,24 @@ class PlaylistsTable extends Table
         return $this->find();
     }
 
-    public function getAllPlaylistsAjax(){
-        $playlists = $this->find()->toArray();
+    public function getAllPlaylistsAjax($page = 1, $offset = 0){
+        $limit = 10;
+        if($page > 1){
+            $offset = $page * $limit;
+        }
 
+        $playlists = $this->find()->limit($limit)->offset($offset);
+        $quantityPlaylists = $this->find()->count();
+        $playlists->toArray();
         if(!empty($playlists)){
             return [
                 'success' => true,
                 'message' => 'Playlists encontradas.',
-                'data' => $playlists
+                'data' => $playlists,
+                'pagination' => [
+                    'current_page' => $page,
+                    'pages' => ceil($quantityPlaylists / $limit)
+                ]
             ];
         }else{
             return [
