@@ -6,8 +6,7 @@ namespace App\Controller;
 class PlaylistsController extends AppController
 {
     public function index($page = 1)
-    {
-    }
+    {}
 
     public function getAllPlaylists($page = 1){
         $this->autoRender = false; // Desativa o auto render

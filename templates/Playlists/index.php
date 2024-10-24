@@ -4,9 +4,7 @@
     <div id="tabela-playlists"></div>
     <div>
         <nav>
-            <ul class="pagination" id="pagination-links">
-                
-            </ul>
+            <ul class="pagination" id="pagination-links"></ul>
         </nav>
     </div>
 </div>
@@ -61,11 +59,9 @@
 
                             PlaylistIndex.utilitarios();
                         }else {
-                            alert(response.message);
                             $('#tabela-playlists').html('<p>Nenhuma playlist encontrada.</p>');
                             $('#pagination-links').empty();
                         }
-                        console.log(response);
                     }
                 });
 
@@ -75,6 +71,10 @@
                 $('.pagination-link').off('click').on('click', function(event){
                     event.preventDefault(); // Evita o comportamento padrão do link
                     var clickedPage = $(this).data('page');
+
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=' + clickedPage;
+                    history.pushState({page: clickedPage}, '', newUrl);
+
                     PlaylistIndex.getAllPlaylists(clickedPage); // Chama a função para carregar a página selecionada
                 });
                 $('.view-playlist').unbind().click(function(){
@@ -90,9 +90,9 @@
                         },
                         error: function(jqXHR) {
                             if (jqXHR.status === 404) {
-                                alert('Playlist não encontrada.');
+                                PlaylistIndex.swal('Erro', 'Playlist não encontrada.', 'error');
                             } else {
-                                alert('Erro ao carregar playlist.');
+                                PlaylistIndex.swal('Erro', 'Erro ao carregar playlist.', 'error');
                             }
                         }
                     });
@@ -114,10 +114,11 @@
                             $('#editPlaylistModal').modal('show');
                         },
                         error: function() {
-                            alert('erro');
+                            PlaylistIndex.swal('Erro', 'Erro ao editar a Playlist.', 'error');
                         }
                     });
                 });
+
                 $('.delete-playlist').unbind().click(function(){
                     var playlistId = $(this).data('playlist-id');
 
@@ -137,16 +138,23 @@
                         },
                         success: function(response) {
                             if (response.success) { 
-                                alert('Playlist atualizada');
+                                PlaylistIndex.swal('Sucesso!', 'Playlist atualizada.', 'success');
                             } else {
-                                alert('Failed to update playlist.');
+                                PlaylistIndex.swal('Erro!', 'Erro ao atualizar a Playlist', 'error');
                             }
 
                             $('#editPlaylistModal').modal('hide');
-                            location.reload();
+                            setTimeout(function() { 
+                                // Pegando o parâmetro "page" da URL
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const paramsPage = urlParams.get('page') || 1;
+                                
+                                // Recarregar a lista de playlists
+                                PlaylistIndex.getAllPlaylists(paramsPage);
+                            }, 1000);
                         },
                         error: function() {
-                            alert('Erro ao atualizar Playlist');
+                            PlaylistIndex.swal('Erro!', 'Erro ao atualizar a Playlist', 'error');
                         }
                     });
                 });
@@ -183,7 +191,12 @@
 
                                         $('#editPlaylistModal').modal('hide');
                                         setTimeout(function() { 
-                                            location.reload();
+                                            // Pegando o parâmetro "page" da URL
+                                            const urlParams = new URLSearchParams(window.location.search);
+                                            const paramsPage = urlParams.get('page') || 1;
+                                            
+                                            // Recarregar a lista de playlists
+                                            PlaylistIndex.getAllPlaylists(paramsPage);
                                         }, 1000);
                                     },
                                     error: function() {
@@ -191,7 +204,7 @@
                                     }
                                 });
                             } else if (result.isDenied) {
-                                Swal.fire("Operação cancelada", "", "info");
+                                PlaylistIndex.swal(null, "Operação cancelada", "", "info");
                             }
                     });
                 }
