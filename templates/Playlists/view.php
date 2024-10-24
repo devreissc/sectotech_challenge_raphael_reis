@@ -40,36 +40,36 @@
             <div class="related">
                 <h4><?= __('Related Conteudos') ?></h4>
                 <?php if (!empty($playlist->conteudos)) : ?>
-                <div class="table-responsive">
-                    <table>
-                        <tr>
-                            <th><?= __('Id') ?></th>
-                            <th><?= __('Playlist Id') ?></th>
-                            <th><?= __('Title') ?></th>
-                            <th><?= __('Url') ?></th>
-                            <th><?= __('Author') ?></th>
-                            <th><?= __('Created At') ?></th>
-                            <th><?= __('Updated At') ?></th>
-                            <th class="actions"><?= __('Actions') ?></th>
-                        </tr>
-                        <?php foreach ($playlist->conteudos as $conteudo) : ?>
-                        <tr>
-                            <td><?= h($conteudo->id) ?></td>
-                            <td><?= h($conteudo->playlist_id) ?></td>
-                            <td><?= h($conteudo->title) ?></td>
-                            <td><?= h($conteudo->url) ?></td>
-                            <td><?= h($conteudo->author) ?></td>
-                            <td><?= h($conteudo->created_at) ?></td>
-                            <td><?= h($conteudo->updated_at) ?></td>
-                            <td class="actions">
-                                <?= $this->Html->link(__('View'), ['controller' => 'Conteudos', 'action' => 'view', $conteudo->id]) ?>
-                                <?= $this->Html->link(__('Edit'), ['controller' => 'Conteudos', 'action' => 'edit', $conteudo->id]) ?>
-                                <?= $this->Form->postLink(__('Delete'), ['controller' => 'Conteudos', 'action' => 'delete', $conteudo->id], ['confirm' => __('Are you sure you want to delete # {0}?', $conteudo->id)]) ?>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </table>
-                </div>
+                    <div class="table-responsive">
+                        <table>
+                            <tr>
+                                <th><?= __('Id') ?></th>
+                                <th><?= __('Playlist Id') ?></th>
+                                <th><?= __('Title') ?></th>
+                                <th><?= __('Url') ?></th>
+                                <th><?= __('Author') ?></th>
+                                <th><?= __('Created At') ?></th>
+                                <th><?= __('Updated At') ?></th>
+                                <th class="actions"><?= __('Actions') ?></th>
+                            </tr>
+                            <?php foreach ($playlist->conteudos as $conteudo) : ?>
+                            <tr>
+                                <td><?= h($conteudo->id) ?></td>
+                                <td><?= h($conteudo->playlist_id) ?></td>
+                                <td><?= h($conteudo->title) ?></td>
+                                <td><?= h($conteudo->url) ?></td>
+                                <td><?= h($conteudo->author) ?></td>
+                                <td><?= h($conteudo->created_at) ?></td>
+                                <td><?= h($conteudo->updated_at) ?></td>
+                                <td class="actions">
+                                    <?= $this->Html->link(__('View'), ['controller' => 'Conteudos', 'action' => 'view', $conteudo->id]) ?>
+                                    <?= $this->Html->link(__('Edit'), ['controller' => 'Conteudos', 'action' => 'edit', $conteudo->id]) ?>
+                                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'Conteudos', 'action' => 'delete', $conteudo->id], ['confirm' => __('Are you sure you want to delete # {0}?', $conteudo->id)]) ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>

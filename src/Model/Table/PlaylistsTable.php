@@ -94,6 +94,7 @@ class PlaylistsTable extends Table
     public function addPlaylist($data = []){
         $playlist = $this->newEmptyEntity();
         $playlist = $this->patchEntity($playlist, $data);
+        
         if ($this->save($playlist)) {
             return $playlist;
         }else{

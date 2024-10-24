@@ -45,25 +45,89 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
     <?= $this->fetch('script') ?>
 </head>
-<body>
-    <nav class="top-nav">
-        <div class="top-nav-title">
-            <a href="<?= $this->Url->build('/') ?>"><span>Cake</span>PHP</a>
-        </div>
-        <div class="top-nav-links">
-            <a target="_blank" rel="noopener" href="https://book.cakephp.org/5/">Documentation</a>
-            <a target="_blank" rel="noopener" href="https://api.cakephp.org/">API</a>
-        </div>
-    </nav>
-    <main class="main">
-        <div class="container">
+<body class="body-admin">
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar-->
+		<div class="bg-dark border-right" id="sidebar-wrapper">
+			<?php echo $this->element('sidebar') ?>
+		</div>
+        
+        <div id="page-content-wrapper">
             <?= $this->Flash->render() ?>
-            <?= $this->fetch('content') ?>
+            <?php echo $this->element('topo'); ?>
+            <div class="container-fluid  px-4 py-3">
+                <?= $this->fetch('content') ?>
+            </div>
         </div>
-    </main>
-    <footer>
-    </footer>
+    </div>
+
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<style>
+    #page-content-wrapper {
+	  min-width: 0;
+	  width: 100%;
+	  background-color: #E2E5E9;
+	}
+
+    .body-admin #wrapper {
+  overflow-x: hidden;
+}
+.body-admin #sidebar-wrapper {
+  width: 260px;
+  min-height: 100vh;
+  transition: margin 0.35s ease-out;
+}
+.body-admin #sidebar-wrapper .logo-aberto {
+  display: block;
+}
+.body-admin #sidebar-wrapper .logo-fechado {
+  display: none;
+}
+.body-admin #sidebar-wrapper.reduzido {
+  width: auto;
+}
+.body-admin #sidebar-wrapper.reduzido .item-label {
+  display: none;
+}
+.body-admin #sidebar-wrapper.reduzido .logo-fechado {
+  display: block;
+}
+.body-admin #sidebar-wrapper.reduzido .logo-aberto {
+  display: none;
+}
+.body-admin #sidebar-wrapper.reduzido .nav-item {
+  text-align: center;
+}
+.body-admin #sidebar-wrapper .nav-pills .nav-link {
+  border-radius: 0 !important;
+}
+.body-admin #sidebar-wrapper .nav-pills .nav-link.active {
+  background-color: #0d5ce1;
+}
+.body-admin #page-content-wrapper {
+  min-width: 0;
+  width: 100%;
+  background-color: #E2E5E9;
+}
+
+@media (max-width: 576px) {
+  .logo-aberto {
+    width: 130px;
+  }
+  #sidebar-wrapper {
+    display: none;
+  }
+  #sidebar-wrapper.reduzido {
+    display: block;
+  }
+  .carteira-box-info {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+</style>
