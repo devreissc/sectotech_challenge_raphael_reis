@@ -64,8 +64,6 @@
                         }
                     }
                 });
-
-                
             },
             utilitarios: function(){
                 $('.pagination-link').off('click').on('click', function(event){
@@ -86,13 +84,15 @@
                         success: function(response){
                             if(response.success){
                                 window.location.href = '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'view']) ?>/' + playlistId;
+                            }else{
+                                PlaylistIndex.showErrorMessage('Erro', 'Erro ao atualizar playlist.');
                             }
                         },
                         error: function(jqXHR) {
                             if (jqXHR.status === 404) {
-                                PlaylistIndex.swal('Erro', 'Playlist não encontrada.', 'error');
+                                PlaylistIndex.showErrorMessage('Erro', 'Playlist não encontrada.');
                             } else {
-                                PlaylistIndex.swal('Erro', 'Erro ao carregar playlist.', 'error');
+                                PlaylistIndex.showErrorMessage('Erro', 'Erro ao carregar playlist.');
                             }
                         }
                     });
@@ -114,15 +114,16 @@
                             $('#editPlaylistModal').modal('show');
                         },
                         error: function() {
-                            PlaylistIndex.swal('Erro', 'Erro ao editar a Playlist.', 'error');
+                            PlaylistIndex.showErrorMessage('Erro', 'Erro ao editar a Playlist.');
                         }
                     });
                 });
 
                 $('.delete-playlist').unbind().click(function(){
                     var playlistId = $(this).data('playlist-id');
+                    var urlRequest = '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'delete']) ?>';
 
-                    PlaylistIndex.swal('deleteOrUpdate', 'Tem certeza que deseja excluir esse registro?',null,null,'<?= $this->Url->build(['controller' => 'playlists', 'action' => 'delete']) ?>', playlistId);
+                    PlaylistIndex.confirmDeleteOrUpdate('Tem certeza que deseja excluir esse registro?', urlRequest, playlistId);
                 });
 
                 $('#savePlaylistChanges').unbind().click(function(){
@@ -138,9 +139,9 @@
                         },
                         success: function(response) {
                             if (response.success) { 
-                                PlaylistIndex.swal('Sucesso!', 'Playlist atualizada.', 'success');
+                                PlaylistIndex.showSuccessMessage('Sucesso!', 'Playlist atualizada.');
                             } else {
-                                PlaylistIndex.swal('Erro!', 'Erro ao atualizar a Playlist', 'error');
+                                PlaylistIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
                             }
 
                             $('#editPlaylistModal').modal('hide');
@@ -154,60 +155,63 @@
                             }, 1000);
                         },
                         error: function() {
-                            PlaylistIndex.swal('Erro!', 'Erro ao atualizar a Playlist', 'error');
+                            PlaylistIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
                         }
                     });
                 });
             },
-            swal: function(type = 'deleteorupdate', modalTitle = '', message = '', context = 'success', url = '', data = []){
-                if(type != 'deleteOrUpdate'){
-                    Swal.fire(modalTitle, message, context);
-                }else{
-                    Swal.fire({
-                        title: modalTitle,
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: "Sim",
-                        denyButtonText: "Não",
-                        cancelButtonText: "Cancelar"
-                        }).then((result) => {
-                            /* Read more about isConfirmed, isDenied below */
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    url: url,
-                                    type: 'post',
-                                    data: {
-                                        id: data
-                                    },
-                                    headers: {
-                                        'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
-                                    },
-                                    success: function(response) {
-                                        if (response.success) { 
-                                            PlaylistIndex.swal(null, 'Sucesso!', response.message);
-                                        } else {
-                                            PlaylistIndex.swal(null, 'Erro!', response.message,'error');
-                                        }
-
-                                        $('#editPlaylistModal').modal('hide');
-                                        setTimeout(function() { 
-                                            // Pegando o parâmetro "page" da URL
-                                            const urlParams = new URLSearchParams(window.location.search);
-                                            const paramsPage = urlParams.get('page') || 1;
-                                            
-                                            // Recarregar a lista de playlists
-                                            PlaylistIndex.getAllPlaylists(paramsPage);
-                                        }, 1000);
-                                    },
-                                    error: function() {
-                                        PlaylistIndex.swal(null, 'Erro!', response.message,'error');
-                                    }
-                                });
-                            } else if (result.isDenied) {
-                                PlaylistIndex.swal(null, "Operação cancelada", "", "info");
-                            }
-                    });
-                }
+            confirmDeleteOrUpdate: function(modalTitle = '', url = '', data = []){
+                Swal.fire({
+                    title: modalTitle,
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Sim",
+                    denyButtonText: "Não",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        PlaylistIndex.requestDeleteOrUpdate(url, data);
+                    } else if (result.isDenied) {
+                        PlaylistIndex.showInfoMessage("Operação cancelada");
+                    }
+                });
+            },
+            requestDeleteOrUpdate: function(url, data) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { id: data },
+                    headers: {
+                        'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            PlaylistIndex.showSuccessMessage('Sucesso!', response.message);
+                        } else {
+                            PlaylistIndex.showErrorMessage('Erro!', response.message);
+                        }
+                        PlaylistIndex.reloadPlaylists();
+                    },
+                    error: function() {
+                        PlaylistIndex.showErrorMessage('Erro!', 'Erro na requisição.');
+                    }
+                });
+            },
+            showSuccessMessage: function(title, message) {
+                Swal.fire(title, message, 'success');
+            },
+            showErrorMessage: function(title, message) {
+                Swal.fire(title, message, 'error');
+            },
+            showInfoMessage: function(message) {
+                Swal.fire('Informação', message, 'info');
+            },
+            reloadPlaylists: function() {
+                setTimeout(function() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const paramsPage = urlParams.get('page') || 1;
+                    PlaylistIndex.getAllPlaylists(paramsPage);
+                }, 1000);
             }
         }
 
