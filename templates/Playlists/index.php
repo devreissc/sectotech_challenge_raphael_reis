@@ -14,7 +14,7 @@
     $(document).ready(function(){
         var PlaylistIndex = {
             init: function(){
-                PlaylistIndex.getAllPlaylists(1);
+                PlaylistIndex.reloadPlaylists();
                 $('#tabela-playlists').html();
             },
             getAllPlaylists: function(page = 1){
@@ -26,6 +26,7 @@
                         page: page
                     },
                     beforeSend: function () {
+
                     },
                     success: function (response) {
                         if(response.success){
@@ -180,7 +181,7 @@
                         } else {
                             GlobalScript.showErrorMessage('Erro!', response.message);
                         }
-                        PlaylistIndex.reloadPlaylists();
+                        PlaylistIndex.reloadPlaylists(1000);
                     },
                     error: function() {
                         GlobalScript.showErrorMessage('Erro!', 'Erro na requisição.');
@@ -189,12 +190,12 @@
 
                 $('#crudPlaylistModal').modal('hide');
             },
-            reloadPlaylists: function() {
+            reloadPlaylists: function(timeout = 0) {
                 setTimeout(function() {
                     const urlParams = new URLSearchParams(window.location.search);
                     const paramsPage = urlParams.get('page') || 1;
                     PlaylistIndex.getAllPlaylists(paramsPage);
-                }, 1000);
+                }, timeout);
             }
         }
 

@@ -14,7 +14,7 @@
     $(document).ready(function(){
         var ConteudosIndex = {
             init: function(){
-                ConteudosIndex.getAllConteudos();
+                ConteudosIndex.reloadConteudos();
             },
             getAllConteudos: function(page = 1){
                 $.ajax({
@@ -179,7 +179,7 @@
                         } else {
                             GlobalScript.showErrorMessage('Erro!', response.message);
                         }
-                        ConteudosIndex.reloadConteudos();
+                        ConteudosIndex.reloadConteudos(1000);
                     },
                     error: function() {
                         GlobalScript.showErrorMessage('Erro!', 'Erro na requisição.');
@@ -188,12 +188,12 @@
 
                 $('#crudConteudoModal').modal('hide');
             },
-            reloadConteudos: function() {
+            reloadConteudos: function(timeout = 0) {
                 setTimeout(function() {
                     const urlParams = new URLSearchParams(window.location.search);
                     const paramsPage = urlParams.get('page') || 1;
                     ConteudosIndex.getAllConteudos(paramsPage);
-                }, 1000);
+                }, timeout);
             }
         }
 
