@@ -21,15 +21,11 @@ class PlaylistsTable extends Table
 
         $this->hasMany('Conteudos', [
             'foreignKey' => 'playlist_id',
+            'dependent' => true,
+            'cascadeCallbacks' => true,
         ]);
     }
-
-    /**
-     * Default validation rules.
-     *
-     * @param \Cake\Validation\Validator $validator Validator instance.
-     * @return \Cake\Validation\Validator
-     */
+    
     public function validationDefault(Validator $validator): Validator
     {
         $validator
