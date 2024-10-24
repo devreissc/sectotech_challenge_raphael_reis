@@ -1,5 +1,5 @@
 <div class="conteudos index content">
-    <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
+    <a href="javascript:;" id="add-conteudo" class="button float-right"><?= __('Novo Conteúdo') ?></a>
     <h3><?= __('Conteúdos') ?></h3>
     
     <div id="tabela-conteudos"></div>
@@ -68,6 +68,11 @@
                 })
             },
             utilitarios: function(){
+                $('#add-conteudo').off('click').on('click', function(event){
+                    event.preventDefault();
+                    $('#crudConteudoModal').modal('show');
+                });
+
                 $('.pagination-link').off('click').on('click', function(event){
                     event.preventDefault(); // Evita o comportamento padrão do link
                     var clickedPage = $(this).data('page');
@@ -89,9 +94,10 @@
                             console.log(response);
                             $('#conteudo-id').val(response.data.id);
                             $('#conteudo-title').val(response.data.title);
-                            $('#conteudo-description').val(response.data.description);
+                            $('#conteudo-url').val(response.data.url);
                             $('#conteudo-author').val(response.data.author);
-                            $('#editConteudoModal').modal('show');
+                            $('#selected-playlist-option').val(response.data.playlist_id);
+                            $('#crudConteudoModal').modal('show');
                         },
                         error: function() {
                             ConteudosIndex.showErrorMessage('Erro', 'Erro ao editar a Conteúdo.');
@@ -99,31 +105,18 @@
                     });
                 });
 
-                $('#saveConteudoChanges').unbind().click(function(){
-                    var dataPlaylist = $('#editConteudoForm').serialize();
+                $('#saveConteudoChanges').off('click').on('click', function(event){
+                    event.preventDefault();
+                    var id = $('#conteudo-id').val();
+                    var url = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'add']) ?>';
 
-                    $.ajax({
-                        url: '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'edit']) ?>/' + $('#conteudo-id').val(),
-                        type: 'post',
-                        data: dataPlaylist,
-                        dateType: 'json',
-                        headers: {
-                            'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response.success) { 
-                                ConteudosIndex.showSuccessMessage('Sucesso!', 'Conteúdo atualizado.');
-                            } else {
-                                ConteudosIndex.showErrorMessage('Erro!', 'Erro ao atualizar o Conteúdo');
-                            }
+                    if(id){
+                        url = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'edit']) ?>/'+id;
+                    }
 
-                            $('#editPlaylistModal').modal('hide');
-                            ConteudosIndex.reloadConteudos();
-                        },
-                        error: function() {
-                            ConteudosIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
-                        }
-                    });
+                    var dataPlaylist = $('#crudConteudoForm').serialize();
+
+                    ConteudosIndex.requestAddOrUpdate(url, dataPlaylist);
                 });
 
                 $('.delete-conteudo').unbind().click(function(){
@@ -166,11 +159,37 @@
                     cancelButtonText: "Cancelar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        ConteudosIndex.requestDeleteOrUpdate(url, data);
+                        ConteudosIndex.requestAddOrUpdate(url, data);
                     } else if (result.isDenied) {
                         ConteudosIndex.showInfoMessage("Operação cancelada");
                     }
                 });
+            },
+            confirmAddOrUpdate: function(){
+
+            },
+            requestAddOrUpdate: function(url, dataPlaylist) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: dataPlaylist,
+                    headers: {
+                    'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            ConteudosIndex.showSuccessMessage('Sucesso!', response.message);
+                        } else {
+                            ConteudosIndex.showErrorMessage('Erro!', response.message);
+                        }
+                        ConteudosIndex.reloadConteudos();
+                    },
+                    error: function() {
+                        ConteudosIndex.showErrorMessage('Erro!', 'Erro na requisição.');
+                    }
+                });
+
+                $('#crudConteudoModal').modal('hide');
             },
             requestDeleteOrUpdate: function(url, data) {
                 $.ajax({

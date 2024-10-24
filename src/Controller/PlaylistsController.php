@@ -7,12 +7,17 @@ class PlaylistsController extends AppController
 {
     public function index(){}
 
-    public function getAllPlaylists($page = 1){
+    public function getAllPlaylists($page = 0){
         $this->autoRender = false; // Desativa o auto render
         $this->viewBuilder()->setLayout('ajax');
 
-        $playlists = $this->Playlists->getAllPlaylistsAjax($page);
-        return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
+        if($page > 0){
+            $playlists = $this->Playlists->getAllPlaylistsAjax($page);
+            return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
+        }else{
+            $playlists = $this->Playlists->getAllPlaylists();
+            return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
+        }
     }
 
     public function view($id = null)
@@ -47,7 +52,7 @@ class PlaylistsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $data = $this->request->getData();
-            $resultado = $this-> Playlists->edit($id, $data);
+            $resultado = $this->Playlists->edit($id, $data);
             return $this->response->withType('application/json')->withStringBody(json_encode($resultado));
         }
     }

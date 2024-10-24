@@ -57,7 +57,11 @@ class PlaylistsTable extends Table
     }
 
     public function getAllPlaylists(){
-        return $this->find();
+        $playlists = $this->find();
+        return [
+            'success' => true,
+            'data' => $playlists
+        ];
     }
 
     public function getAllPlaylistsAjax($page = 1, $offset = 0){

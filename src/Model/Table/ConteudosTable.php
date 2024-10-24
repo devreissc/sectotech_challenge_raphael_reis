@@ -100,8 +100,10 @@ class ConteudosTable extends Table
             'playlist_id',
             'Playlists.title'
         ])->contain(['Playlists'])->limit($limit)->offset($offset);
+
         $quantityConteudos = $this->find()->count();
         $conteudos->toArray();
+        
         if(!empty($conteudos)){
             return [
                 'success' => true,
@@ -116,6 +118,65 @@ class ConteudosTable extends Table
             return [
                 'success' => false,
                 'message' => 'Não foi encontrado nenhum conteúdo.'
+            ];
+        }
+    }
+
+    public function editConteudo($id = null, $data = []){
+        if(is_null($id) || empty($data)){
+            return [
+                'success' => false,
+                'message' => 'Erro, os dados necessários para realizar a atualização não foram encontrados'
+            ];
+        }else{
+            $conteudo = $this->get($id);
+            $conteudo = $this->patchEntity($conteudo, $data);
+
+            if ($this->save($conteudo)) {
+                return [
+                    'success' => true,
+                    'message' => 'Conteúdo atualizado com sucesso.',
+                    'data' => $conteudo
+                ];
+            } else {
+                return [
+                    'success' => false,
+                    'message' => 'Erro ao atualizar o conteúdo.'
+                ];
+            }
+        }
+    }
+
+    public function addConteudo($data = []){
+        $conteudo = $this->newEmptyEntity();
+        $conteudo = $this->patchEntity($conteudo, $data);
+        
+        if ($this->save($conteudo)) {
+            return [
+                'success' => true,
+                'data' => $conteudo,
+                'message' => 'Conteúdo adicionado com sucesso'
+            ];
+        }else{
+            return [
+                'success' => false,
+                'message' => 'Erro ao adicionar o conteúdo, por favor, recarregue a página e tente novamente'
+            ];
+        }
+    }
+
+    public function deleteConteudo(int $id){
+        $conteudo = $this->get($id);
+
+        if($this->delete($conteudo)){
+            return [
+                'success' => true,
+                'message' => 'Conteúdo excluído com sucesso'
+            ];
+        }else{
+            return [
+                'success' => false,
+                'message' => 'Erro ao excluir o conteúdo, por favor, recarregue a página e tente novamente'
             ];
         }
     }

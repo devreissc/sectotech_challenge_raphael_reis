@@ -41,34 +41,23 @@ class ConteudosController extends AppController
 
     public function add()
     {
-        $conteudo = $this->Conteudos->newEmptyEntity();
-        if ($this->request->is('post')) {
-            $conteudo = $this->Conteudos->patchEntity($conteudo, $this->request->getData());
-            if ($this->Conteudos->save($conteudo)) {
-                $this->Flash->success(__('The conteudo has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The conteudo could not be saved. Please, try again.'));
-        }
-        $playlists = $this->Conteudos->Playlists->find('list', limit: 200)->all();
-        $this->set(compact('conteudo', 'playlists'));
+        $this->autoRender = false;
+        $this->request->allowMethod(['post']);
+        
+        $response = $this->Conteudos->addConteudo($this->request->getData());
+        
+        // Retorna a resposta com JSON
+        return $this->response->withType('application/json')->withStringBody(json_encode($response));
     }
 
     public function edit($id = null)
     {
-        $conteudo = $this->Conteudos->get($id, contain: []);
+        $this->autoRender = false;
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $conteudo = $this->Conteudos->patchEntity($conteudo, $this->request->getData());
-            if ($this->Conteudos->save($conteudo)) {
-                $this->Flash->success(__('The conteudo has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The conteudo could not be saved. Please, try again.'));
+            $data = $this->request->getData();
+            $resultado = $this->Conteudos->editConteudo($id, $data);
+            return $this->response->withType('application/json')->withStringBody(json_encode($resultado));
         }
-        $playlists = $this->Conteudos->Playlists->find('list', limit: 200)->all();
-        $this->set(compact('conteudo', 'playlists'));
     }
 
     public function delete()
@@ -76,18 +65,10 @@ class ConteudosController extends AppController
         $this->autoRender = false;
         $this->request->allowMethod(['post', 'delete']);
         $id = $this->request->getData('id');
-        $conteudo = $this->Conteudos->get($id);
 
-        if ($this->Conteudos->delete($conteudo)) {
-            return $this->response->withType('application/json')->withStringBody(json_encode([
-                'success' => true,
-                'message' => 'Conteúdo excluída com sucesso'
-            ]));
-        } else {
-            return $this->response->withType('application/json')->withStringBody(json_encode([
-                'success' => false,
-                'message' => 'Erro ao excluir o Conteúdo, por favor, recarregue a página e tente novamente'
-            ]));
-        }
+        $response = $this->Conteudos->deleteConteudo((int) $id);
+        
+        // Retorna a resposta com JSON
+        return $this->response->withType('application/json')->withStringBody(json_encode($response));
     }
 }

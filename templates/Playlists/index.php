@@ -14,7 +14,7 @@
     $(document).ready(function(){
         var PlaylistIndex = {
             init: function(){
-                PlaylistIndex.getAllPlaylists();
+                PlaylistIndex.getAllPlaylists(1);
             },
             getAllPlaylists: function(page = 1){
                 $.ajax({
