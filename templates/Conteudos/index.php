@@ -108,22 +108,24 @@
                 $('#saveConteudoChanges').off('click').on('click', function(event){
                     event.preventDefault();
                     var id = $('#conteudo-id').val();
-                    var url = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'add']) ?>';
+                    var urlRequest = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'add']) ?>';
+                    var message = 'Tem certeza que deseja salvar esse conteúdo?';
 
                     if(id){
-                        url = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'edit']) ?>/'+id;
+                        urlRequest = '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'edit']) ?>/'+id;
+                        message = 'Tem certeza que deseja salvar as alterações?';
                     }
 
                     var dataPlaylist = $('#crudConteudoForm').serialize();
 
-                    ConteudosIndex.requestAddOrUpdate(url, dataPlaylist);
+                    ConteudosIndex.confirmOperation(message, urlRequest, dataPlaylist);
                 });
 
                 $('.delete-conteudo').unbind().click(function(){
                     var conteudoId = $(this).data('conteudo-id');
                     var urlRequest = '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'delete']) ?>';
 
-                    ConteudosIndex.confirmDeleteOrUpdate('Tem certeza que deseja excluir esse registro?', urlRequest, conteudoId);
+                    ConteudosIndex.confirmOperation('Tem certeza que deseja excluir esse registro?', urlRequest, {id: conteudoId});
                 });
 
                 $('.view-conteudo').unbind().click(function(){
@@ -149,7 +151,7 @@
                     });
                 });
             },
-            confirmDeleteOrUpdate: function(modalTitle = '', url = '', data = []){
+            confirmOperation: function(modalTitle = '', url = '', data = []){
                 Swal.fire({
                     title: modalTitle,
                     showDenyButton: true,
@@ -159,43 +161,17 @@
                     cancelButtonText: "Cancelar"
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        ConteudosIndex.requestAddOrUpdate(url, data);
+                        ConteudosIndex.requestOperation(url, data);
                     } else if (result.isDenied) {
                         ConteudosIndex.showInfoMessage("Operação cancelada");
                     }
                 });
             },
-            confirmAddOrUpdate: function(){
-
-            },
-            requestAddOrUpdate: function(url, dataPlaylist) {
+            requestOperation: function(url, dataPlaylist) {
                 $.ajax({
                     url: url,
                     type: 'POST',
                     data: dataPlaylist,
-                    headers: {
-                    'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            ConteudosIndex.showSuccessMessage('Sucesso!', response.message);
-                        } else {
-                            ConteudosIndex.showErrorMessage('Erro!', response.message);
-                        }
-                        ConteudosIndex.reloadConteudos();
-                    },
-                    error: function() {
-                        ConteudosIndex.showErrorMessage('Erro!', 'Erro na requisição.');
-                    }
-                });
-
-                $('#crudConteudoModal').modal('hide');
-            },
-            requestDeleteOrUpdate: function(url, data) {
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: { id: data },
                     headers: {
                         'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
                     },
@@ -211,6 +187,8 @@
                         ConteudosIndex.showErrorMessage('Erro!', 'Erro na requisição.');
                     }
                 });
+
+                $('#crudConteudoModal').modal('hide');
             },
             showSuccessMessage: function(title, message) {
                 Swal.fire(title, message, 'success');
