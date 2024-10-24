@@ -7,15 +7,11 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\EventInterface;
+use ArrayObject;
 
 class ConteudosTable extends Table
 {
-    /**
-     * Initialize method
-     *
-     * @param array<string, mixed> $config The configuration for the Table.
-     * @return void
-     */
     public function initialize(array $config): void
     {
         parent::initialize($config);
@@ -71,13 +67,41 @@ class ConteudosTable extends Table
         return $rules;
     }
 
+    public function afterFindFunction($conteudos)
+    {
+        $mapper = function ($conteudo, $key, $mapReduce) {
+            if (!empty($conteudo->created_at)) {
+                $conteudo->created_at = $conteudo->created_at->format('d/m/Y H:i');
+            }
+            if (!empty($conteudo->updated_at)) {
+                $conteudo->updated_at = $conteudo->updated_at->format('d/m/Y H:i');
+            }
+            $mapReduce->emit($conteudo);
+        };
+
+        $reducer = function ($conteudo, $key, $mapReduce) {
+            $mapReduce->emit($conteudo);
+        };
+
+        return $conteudos->mapReduce($mapper, $reducer)->toArray();
+    }
+
+    public function beforeSave(EventInterface $event, $entity, ArrayObject $options)
+    {
+        // Atualiza o campo updated_at ao editar um conteúdo 
+        if (!$entity->isNew()) {
+            $entity->updated_at = date('Y-m-d H:i:s');
+        }
+    }
+
     public function getAllConteudos(){
         return $this->find();
     }
 
     public function getConteudosByPlaylistId($playlistId)
     {
-        return $this->find('all')->where(['playlist_id' => $playlistId])->orderByDesc('created_at');
+        $conteudosByPlaylistId = $this->find('all')->where(['playlist_id' => $playlistId])->orderByDesc('created_at');
+        return $this->afterFindFunction($conteudosByPlaylistId);
     }
 
     public function getAllConteudosAjax($page = 1){
@@ -102,13 +126,12 @@ class ConteudosTable extends Table
         ])->contain(['Playlists'])->limit($limit)->offset($offset);
 
         $quantityConteudos = $this->find()->count();
-        $conteudos->toArray();
         
         if(!empty($conteudos)){
             return [
                 'success' => true,
                 'message' => 'Conteúdos encontradas.',
-                'data' => $conteudos,
+                'data' => $this->afterFindFunction($conteudos),
                 'pagination' => [
                     'current_page' => $page,
                     'pages' => ceil($quantityConteudos / $limit)

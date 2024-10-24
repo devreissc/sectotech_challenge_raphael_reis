@@ -7,6 +7,8 @@ use Cake\ORM\Query\SelectQuery;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\Event\EventInterface;
+use ArrayObject;
 
 
 class PlaylistsTable extends Table
@@ -56,16 +58,49 @@ class PlaylistsTable extends Table
         return $validator;
     }
 
+    /**
+    *    https://book.cakephp.org/5/en/orm/retrieving-data-and-resultsets.html#map-reduce
+    *
+    *    Função para modificar o campo create_at e updated_at para o padrão "d/m/Y H:i"
+    */
+    public function afterFindFunction($playlists)
+    {
+        $mapper = function ($playlist, $key, $mapReduce) {
+            if (!empty($playlist->created_at)) {
+                $playlist->created_at = $playlist->created_at->format('d/m/Y H:i');
+            }
+            if (!empty($playlist->updated_at)) {
+                $playlist->updated_at = $playlist->updated_at->format('d/m/Y H:i');
+            }
+            $mapReduce->emit($playlist);
+        };
+
+        $reducer = function ($playlist, $key, $mapReduce) {
+            $mapReduce->emit($playlist);
+        };
+
+        return $playlists->mapReduce($mapper, $reducer)->toArray();
+    }
+
+    public function beforeSave(EventInterface $event, $entity, ArrayObject $options)
+    {
+        // Atualiza o campo updated_at ao editar uma playlist
+        if (!$entity->isNew()) {
+            $entity->updated_at = date('Y-m-d H:i:s');
+        }
+    }
+
     public function getAllPlaylists(){
         $playlists = $this->find();
         return [
             'success' => true,
-            'data' => $playlists
+            'data' => $this->afterFindFunction($playlists)
         ];
     }
 
     public function getAllPlaylistsAjax($page = 1, $offset = 0){
         $limit = 10;
+
         if($page > 2){
             $offset = ($page-1) * $limit;
         }elseif($page == 2){
@@ -73,13 +108,14 @@ class PlaylistsTable extends Table
         }
 
         $playlists = $this->find()->limit($limit)->offset($offset);
+        
         $quantityPlaylists = $this->find()->count();
-        $playlists->toArray();
+        
         if(!empty($playlists)){
             return [
                 'success' => true,
                 'message' => 'Playlists encontradas.',
-                'data' => $playlists,
+                'data' => $this->afterFindFunction($playlists),
                 'pagination' => [
                     'current_page' => $page,
                     'pages' => ceil($quantityPlaylists / $limit)
@@ -93,8 +129,6 @@ class PlaylistsTable extends Table
         }
     }
 
-
-    // Adiciona Playlist
     public function addPlaylist($data = []){
         $playlist = $this->newEmptyEntity();
         $playlist = $this->patchEntity($playlist, $data);

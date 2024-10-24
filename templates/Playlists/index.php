@@ -15,6 +15,7 @@
         var PlaylistIndex = {
             init: function(){
                 PlaylistIndex.getAllPlaylists(1);
+                $('#tabela-playlists').html();
             },
             getAllPlaylists: function(page = 1){
                 $.ajax({
