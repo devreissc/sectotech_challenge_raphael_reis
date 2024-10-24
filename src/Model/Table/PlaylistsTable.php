@@ -66,8 +66,10 @@ class PlaylistsTable extends Table
 
     public function getAllPlaylistsAjax($page = 1, $offset = 0){
         $limit = 10;
-        if($page > 1){
-            $offset = $page * $limit;
+        if($page > 2){
+            $offset = ($page-1) * $limit;
+        }elseif($page == 2){
+            $offset = $limit;
         }
 
         $playlists = $this->find()->limit($limit)->offset($offset);
