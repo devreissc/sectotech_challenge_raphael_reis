@@ -12,12 +12,11 @@
 
 <script>
     $(document).ready(function(){
-        var ConteudosIndes = {
+        var ConteudosIndex = {
             init: function(){
-                ConteudosIndes.getAllConteudos();
+                ConteudosIndex.getAllConteudos();
             },
             getAllConteudos: function(page = 1){
-                alert('1');
                 $.ajax({
                     url: '<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'getAllConteudos']); ?>/'+page,
                     type: "GET",
@@ -60,7 +59,7 @@
                                 $('#pagination-links').append(link);
                             }
 
-                            ConteudosIndes.utilitarios();
+                            ConteudosIndex.utilitarios();
                         }else {
                             $('#tabela-conteudos').html('<p>Nenhum conteúdo encontrado.</p>');
                             $('#pagination-links').empty();
@@ -69,10 +68,151 @@
                 })
             },
             utilitarios: function(){
-                alert('2');
+                $('.pagination-link').off('click').on('click', function(event){
+                    event.preventDefault(); // Evita o comportamento padrão do link
+                    var clickedPage = $(this).data('page');
+
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=' + clickedPage;
+                    history.pushState({page: clickedPage}, '', newUrl);
+
+                    ConteudosIndex.getAllConteudos(clickedPage); // Chama a função para carregar a página selecionada
+                });
+
+                $('.edit-conteudo').unbind().click(function(){
+                    var conteudoId = $(this).data('conteudo-id');
+
+                    $.ajax({
+                        url: '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'getConteudo']) ?>/'+conteudoId,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function(response){
+                            console.log(response);
+                            $('#conteudo-id').val(response.data.id);
+                            $('#conteudo-title').val(response.data.title);
+                            $('#conteudo-description').val(response.data.description);
+                            $('#conteudo-author').val(response.data.author);
+                            $('#editConteudoModal').modal('show');
+                        },
+                        error: function() {
+                            ConteudosIndex.showErrorMessage('Erro', 'Erro ao editar a Conteúdo.');
+                        }
+                    });
+                });
+
+                $('#saveConteudoChanges').unbind().click(function(){
+                    var dataPlaylist = $('#editConteudoForm').serialize();
+
+                    $.ajax({
+                        url: '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'edit']) ?>/' + $('#conteudo-id').val(),
+                        type: 'post',
+                        data: dataPlaylist,
+                        dateType: 'json',
+                        headers: {
+                            'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response.success) { 
+                                ConteudosIndex.showSuccessMessage('Sucesso!', 'Conteúdo atualizado.');
+                            } else {
+                                ConteudosIndex.showErrorMessage('Erro!', 'Erro ao atualizar o Conteúdo');
+                            }
+
+                            $('#editPlaylistModal').modal('hide');
+                            ConteudosIndex.reloadConteudos();
+                        },
+                        error: function() {
+                            ConteudosIndex.showErrorMessage('Erro!', 'Erro ao atualizar a Playlist');
+                        }
+                    });
+                });
+
+                $('.delete-conteudo').unbind().click(function(){
+                    var conteudoId = $(this).data('conteudo-id');
+                    var urlRequest = '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'delete']) ?>';
+
+                    ConteudosIndex.confirmDeleteOrUpdate('Tem certeza que deseja excluir esse registro?', urlRequest, conteudoId);
+                });
+
+                $('.view-conteudo').unbind().click(function(){
+                    var conteudoId = $(this).data('conteudo-id');
+                    $.ajax({
+                        url: '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'getConteudo']) ?>/'+conteudoId,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function(response){
+                            if(response.success){
+                                window.location.href = '<?= $this->Url->build(['controller' => 'conteudos', 'action' => 'view']) ?>/' + conteudoId;
+                            }else{
+                                ConteudosIndex.showErrorMessage('Erro', 'Erro ao atualizar o conteúdo.');
+                            }
+                        },
+                        error: function(jqXHR) {
+                            if (jqXHR.status === 404) {
+                                ConteudosIndex.showErrorMessage('Erro', 'Conteúdo não encontrado.');
+                            } else {
+                                ConteudosIndex.showErrorMessage('Erro', 'Erro ao carregar o conteúdo.');
+                            }
+                        }
+                    });
+                });
+            },
+            confirmDeleteOrUpdate: function(modalTitle = '', url = '', data = []){
+                Swal.fire({
+                    title: modalTitle,
+                    showDenyButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: "Sim",
+                    denyButtonText: "Não",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        ConteudosIndex.requestDeleteOrUpdate(url, data);
+                    } else if (result.isDenied) {
+                        ConteudosIndex.showInfoMessage("Operação cancelada");
+                    }
+                });
+            },
+            requestDeleteOrUpdate: function(url, data) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: { id: data },
+                    headers: {
+                        'X-CSRF-Token': $('meta[name="csrfToken"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            ConteudosIndex.showSuccessMessage('Sucesso!', response.message);
+                        } else {
+                            ConteudosIndex.showErrorMessage('Erro!', response.message);
+                        }
+                        ConteudosIndex.reloadConteudos();
+                    },
+                    error: function() {
+                        ConteudosIndex.showErrorMessage('Erro!', 'Erro na requisição.');
+                    }
+                });
+            },
+            showSuccessMessage: function(title, message) {
+                Swal.fire(title, message, 'success');
+            },
+            showErrorMessage: function(title, message) {
+                Swal.fire(title, message, 'error');
+            },
+            showInfoMessage: function(message) {
+                Swal.fire('Informação', message, 'info');
+            },
+            reloadConteudos: function() {
+                setTimeout(function() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const paramsPage = urlParams.get('page') || 1;
+                    ConteudosIndex.getAllConteudos(paramsPage);
+                }, 1000);
             }
         }
 
-        ConteudosIndes.init();
+        ConteudosIndex.init();
     });
 </script>
+
+<?= $this->element('modais/modal_edit_conteudo'); ?>

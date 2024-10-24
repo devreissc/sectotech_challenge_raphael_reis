@@ -18,6 +18,14 @@ class ConteudosController extends AppController
     public function view($id = null)
     {
         $conteudo = $this->Conteudos->get($id, contain: ['Playlists']);
+        $this->set(compact('conteudo'));
+    }
+
+    public function getConteudo($id = null){
+        $this->request->allowMethod(['get']);
+        
+        $conteudo = $this->Conteudos->get($id);
+        
         if($conteudo){
             return $this->response->withType('application/json')->withStringBody(json_encode([
                 'success' => true,
@@ -47,13 +55,6 @@ class ConteudosController extends AppController
         $this->set(compact('conteudo', 'playlists'));
     }
 
-    /**
-     * Edit method
-     *
-     * @param string|null $id Conteudo id.
-     * @return \Cake\Http\Response|null|void Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function edit($id = null)
     {
         $conteudo = $this->Conteudos->get($id, contain: []);
@@ -70,23 +71,23 @@ class ConteudosController extends AppController
         $this->set(compact('conteudo', 'playlists'));
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Conteudo id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
+    public function delete()
     {
+        $this->autoRender = false;
         $this->request->allowMethod(['post', 'delete']);
+        $id = $this->request->getData('id');
         $conteudo = $this->Conteudos->get($id);
-        if ($this->Conteudos->delete($conteudo)) {
-            $this->Flash->success(__('The conteudo has been deleted.'));
-        } else {
-            $this->Flash->error(__('The conteudo could not be deleted. Please, try again.'));
-        }
 
-        return $this->redirect(['action' => 'index']);
+        if ($this->Conteudos->delete($conteudo)) {
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => true,
+                'message' => 'Conteúdo excluída com sucesso'
+            ]));
+        } else {
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => false,
+                'message' => 'Erro ao excluir o Conteúdo, por favor, recarregue a página e tente novamente'
+            ]));
+        }
     }
 }

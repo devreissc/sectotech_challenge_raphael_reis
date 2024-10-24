@@ -97,7 +97,7 @@
                             }
                         }
                     });
-                }),
+                });
                 
                 $('.edit-playlist').unbind().click(function(){
                     var playlistId = $(this).data('playlist-id');

@@ -1,10 +1,3 @@
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\Conteudo $conteudo
- * @var \Cake\Collection\CollectionInterface|string[] $playlists
- */
-?>
 <div class="row">
     <aside class="column">
         <div class="side-nav">
