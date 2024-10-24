@@ -1,6 +1,7 @@
 <div class="playlists index content">
     <?= $this->Html->link(__('New Playlist'), ['action' => 'add'], ['class' => 'button float-right']) ?>
     <h3><?= __('Playlists') ?></h3>
+    
     <div id="tabela-playlists"></div>
     <div>
         <nav>
