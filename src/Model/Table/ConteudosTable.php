@@ -8,25 +8,6 @@ use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
-/**
- * Conteudos Model
- *
- * @property \App\Model\Table\PlaylistsTable&\Cake\ORM\Association\BelongsTo $Playlists
- *
- * @method \App\Model\Entity\Conteudo newEmptyEntity()
- * @method \App\Model\Entity\Conteudo newEntity(array $data, array $options = [])
- * @method array<\App\Model\Entity\Conteudo> newEntities(array $data, array $options = [])
- * @method \App\Model\Entity\Conteudo get(mixed $primaryKey, array|string $finder = 'all', \Psr\SimpleCache\CacheInterface|string|null $cache = null, \Closure|string|null $cacheKey = null, mixed ...$args)
- * @method \App\Model\Entity\Conteudo findOrCreate($search, ?callable $callback = null, array $options = [])
- * @method \App\Model\Entity\Conteudo patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method array<\App\Model\Entity\Conteudo> patchEntities(iterable $entities, array $data, array $options = [])
- * @method \App\Model\Entity\Conteudo|false save(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method \App\Model\Entity\Conteudo saveOrFail(\Cake\Datasource\EntityInterface $entity, array $options = [])
- * @method iterable<\App\Model\Entity\Conteudo>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Conteudo>|false saveMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Conteudo>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Conteudo> saveManyOrFail(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Conteudo>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Conteudo>|false deleteMany(iterable $entities, array $options = [])
- * @method iterable<\App\Model\Entity\Conteudo>|\Cake\Datasource\ResultSetInterface<\App\Model\Entity\Conteudo> deleteManyOrFail(iterable $entities, array $options = [])
- */
 class ConteudosTable extends Table
 {
     /**
@@ -97,5 +78,45 @@ class ConteudosTable extends Table
     public function getConteudosByPlaylistId($playlistId)
     {
         return $this->find('all')->where(['playlist_id' => $playlistId])->orderByDesc('created_at');
+    }
+
+    public function getAllConteudosAjax($page = 1){
+        $limit = 10;
+        $offset = 0;
+
+        if($page > 2){
+            $offset = ($page-1) * $limit;
+        }elseif($page == 2){
+            $offset = $limit;
+        }
+
+        $conteudos = $this->find()->select([
+            'id',
+            'title',
+            'url',
+            'author',
+            'created_at',
+            'updated_at',
+            'playlist_id',
+            'Playlists.title'
+        ])->contain(['Playlists'])->limit($limit)->offset($offset);
+        $quantityConteudos = $this->find()->count();
+        $conteudos->toArray();
+        if(!empty($conteudos)){
+            return [
+                'success' => true,
+                'message' => 'Conteúdos encontradas.',
+                'data' => $conteudos,
+                'pagination' => [
+                    'current_page' => $page,
+                    'pages' => ceil($quantityConteudos / $limit)
+                ]
+            ];
+        }else{
+            return [
+                'success' => false,
+                'message' => 'Não foi encontrado nenhum conteúdo.'
+            ];
+        }
     }
 }

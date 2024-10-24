@@ -3,44 +3,34 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-/**
- * Conteudos Controller
- *
- * @property \App\Model\Table\ConteudosTable $Conteudos
- */
 class ConteudosController extends AppController
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null|void Renders view
-     */
-    public function index()
-    {
-        $query = $this->Conteudos->getAllConteudos();
-        $conteudos = $this->paginate($query);
+    public function index(){}
 
-        $this->set(compact('conteudos'));
+    public function getAllConteudos($page = 1){
+        $this->autoRender = false; // Desativa o auto render
+        $this->viewBuilder()->setLayout('ajax');
+
+        $conteudos = $this->Conteudos->getAllConteudosAjax($page);
+        return $this->response->withType('application/json')->withStringBody(json_encode($conteudos));
     }
 
-    /**
-     * View method
-     *
-     * @param string|null $id Conteudo id.
-     * @return \Cake\Http\Response|null|void Renders view
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
     public function view($id = null)
     {
         $conteudo = $this->Conteudos->get($id, contain: ['Playlists']);
-        $this->set(compact('conteudo'));
+        if($conteudo){
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => true,
+                'data' => $conteudo
+            ]));
+        }else{
+            return $this->response->withStatus(404)->withType('application/json')->withStringBody(json_encode([
+                'success' => false,
+                'error' => 'Conteúdo não encontrado.'
+            ]));
+        }
     }
 
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null|void Redirects on successful add, renders view otherwise.
-     */
     public function add()
     {
         $conteudo = $this->Conteudos->newEmptyEntity();
