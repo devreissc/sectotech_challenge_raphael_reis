@@ -74,3 +74,8 @@
         <?php endif; ?>
     </div>
 </div>
+
+<?php echo $this->element('scripts/playlistIndexScript') ?>
+<?php echo $this->element('modais/modal_edit_playlist'); ?>
+<?php echo $this->element('scripts/conteudoIndexScript') ?>
+<?php echo $this->element('modais/modal_edit_conteudo'); ?>

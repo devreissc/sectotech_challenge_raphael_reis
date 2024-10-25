@@ -72,6 +72,31 @@ class PlaylistsController extends AppController
     {
         $this->request->allowMethod(['get']);
         
+        $playlist = $this->Playlists->get($id);
+        
+        if($playlist){
+            return $this->response->withType('application/json')->withStringBody(json_encode([
+                'success' => true,
+                'data' => $playlist
+            ]));
+        }else{
+            try {
+                $playlist = $this->Playlists->get($id, ['contain' => ['Conteudos']]);
+                $this->set(compact('playlist'));
+                $this->viewBuilder()->setLayout('ajax'); // Define o layout como 'ajax' para evitar cabeçalhos e rodapés
+            } catch (RecordNotFoundException $e) {
+                return $this->response->withStatus(404)->withType('application/json')->withStringBody(json_encode([
+                    'success' => false,
+                    'error' => 'Playlist não encontrada.'
+                ]));
+            }
+        }
+    }
+
+    public function getPlaylistAjax($id = null)
+    {
+        $this->request->allowMethod(['get']);
+        
         try {
             $playlist = $this->Playlists->get($id, ['contain' => ['Conteudos']]);
             $this->set(compact('playlist'));

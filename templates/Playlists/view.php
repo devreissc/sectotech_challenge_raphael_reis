@@ -10,16 +10,11 @@
     </div>
 </section>
 
-<?php echo $this->element('scripts/playlistIndexScript') ?>
-<?php echo $this->element('modais/modal_edit_playlist'); ?>
-<?php echo $this->element('scripts/conteudoIndexScript') ?>
-<?php echo $this->element('modais/modal_edit_conteudo'); ?>
-
 <script>
     $(document).ready(function() {
         var playlistId = <?= json_encode($id) ?>;
         $.ajax({
-            url: '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'getPlaylist']) ?>/' + playlistId,
+            url: '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'getPlaylistAjax']) ?>/' + playlistId,
             method: 'GET',
             dataType: 'html',
             success: function(response) {
