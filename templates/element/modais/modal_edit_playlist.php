@@ -38,7 +38,7 @@
         CrudPlaylistScript.modalConfiguration();
       },
       modalConfiguration: function(){
-        var id = $('#conteudo-id').val();
+        var id = $('#playlist-id').val();
 
         if(id){
           $('.modal-title').html('Editar playlist');
@@ -49,7 +49,9 @@
     }
     
     $('#crudPlaylistModal').on('hidden.bs.modal', function(){
+      $(this).find('#playlist-id').val('');
       $(this).find('#crudPlaylistForm').trigger('reset');
+      $(this).find('#crudPlaylistModalLabel').html('');
     });
 
     $('#crudPlaylistModal').on('shown.bs.modal', function () {

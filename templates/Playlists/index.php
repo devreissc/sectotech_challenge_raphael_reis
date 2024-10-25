@@ -1,14 +1,34 @@
-<div class="playlists index content">
-<a href="javascript:;" id="add-playlist" class="button float-right"><?= __('Nova Playlist') ?></a>
-    <h3><?= __('Playlists') ?></h3>
-    
-    <div id="tabela-playlists"></div>
-    <div>
-        <nav>
-            <ul class="pagination" id="pagination-links"></ul>
-        </nav>
+<section class="">
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col col-6 d-flex align-items-center mb-3">
+                <h1 class="text-dark font-bold"><?php echo __('Playlists') ?></h1>
+            </div>
+            
+            <div class="col-auto mb-3 justify-content-end">
+                <a href="javascript:;" id="add-playlist" style="font-size: larger;" class="btn btn-2 btn-primary text-white btn-block px-4 py-2 me-3 text-nowrap"><?= __('Nova Playlist') ?></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card p-4" style="border-radius: 8px; min-height: calc(100vh - 380px);" >
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <div id="tabela-playlists"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-4">
+                <nav>
+                    <ul class="pagination" id="pagination-links"></ul>
+                </nav>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
 <script>
     $(document).ready(function(){
@@ -31,17 +51,17 @@
                     success: function (response) {
                         if(response.success){
                             // Cria o HTML para exibir as playlists
-                            var html = '<table>';
-                            html += '<tr><th>ID</th><th>Title</th><th>Autor</th><th>Descrição</th><th>Data de criação</th><th>Última atualização</th><th>Ações</th></tr>';
+                            var html = '<table class="table">';
+                            html += '<thead class="table-dark"><tr><th>ID</th><th>Título</th><th>Autor</th><th>Descrição</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr></thead>';
                             response.data.forEach(function(playlist) {
                                 html += '<tr>';
                                 html += '<td>' + playlist.id + '</td>';
                                 html += '<td>' + playlist.title + '</td>';
                                 html += '<td>' + playlist.author + '</td>';
                                 html += '<td>' + playlist.description + '</td>';
-                                html += '<td>' + playlist.created_at + '</td>';
-                                html += '<td>' + playlist.updated_at + '</td>';
-                                html += '<td><a href="javascript:;" class="btn btn-primary view-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Visualizar</a>'
+                                html += '<td class="text-center">' + playlist.created_at + '</td>';
+                                html += '<td class="text-center">' + playlist.updated_at + '</td>';
+                                html += '<td class="text-center"><a href="javascript:;" class="btn btn-primary view-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Visualizar</a>'
                                     + '<a href="javascript:;" class="btn btn-secondary edit-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Editar</a>'
                                     + '<a href="javascript:;" class="btn btn-danger delete-playlist mx-1" data-playlist-id="' + playlist.id + '">' + 'Excluir</a>'
                                     + '</td>';

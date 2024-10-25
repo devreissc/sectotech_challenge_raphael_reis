@@ -32,6 +32,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
     <?= $this->Html->css(
         [
+            'home',
             'normalize.min', 
             'milligram.min',
             'fonts', 
@@ -59,23 +60,16 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     
     <?=  $this->Html->meta('csrfToken', $this->request->getAttribute('csrfToken')); ?>    
 </head>
-<body>
-    <nav class="top-nav">
-        <div class="top-nav-title">
-            <a href="<?= $this->Url->build('/') ?>"><span>Cake</span>PHP</a>
+<body class="body-admin">
+    <div class="d-flex" id="wrapper">
+        <div id="page-content-wrapper">
+            <?php echo $this->element('topo'); ?>
+            <?php echo $this->Flash->render(); ?>
+            <div class="container-fluid px-4 py-3" style="min-height:92vh">
+                <?php echo $this->fetch('content')?>
+            </div>
         </div>
-        <div class="top-nav-links">
-            <a target="_blank" rel="noopener" href="https://book.cakephp.org/5/">Documentation</a>
-            <a target="_blank" rel="noopener" href="https://api.cakephp.org/">API</a>
-        </div>
-    </nav>
-    <main class="main">
-        <div class="container">
-            <?= $this->Flash->render() ?>
-            <?= $this->fetch('content') ?>
-        </div>
-    </main>
-
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 </body>

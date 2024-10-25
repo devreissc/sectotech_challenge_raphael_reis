@@ -2,7 +2,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modal-crud-conteudo-title"></h5>
+        <h5 class="modal-title fs-5" id="crudConteudoModalLabel"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -80,6 +80,8 @@
     
     $('#crudConteudoModal').on('hidden.bs.modal', function(){
       $(this).find('#crudConteudoForm').trigger('reset');
+      $(this).find('#conteudo-id').val('');
+      $(this).find('#crudConteudoModalLabel').html('');
     });
 
     $('#crudConteudoModal').on('shown.bs.modal', function () {

@@ -1,14 +1,34 @@
-<div class="conteudos index content">
-    <a href="javascript:;" id="add-conteudo" class="button float-right"><?= __('Novo Conteúdo') ?></a>
-    <h3><?= __('Conteúdos') ?></h3>
-    
-    <div id="tabela-conteudos"></div>
-    <div>
-        <nav>
-            <ul class="pagination" id="pagination-links"></ul>
-        </nav>
+<section class="">
+    <div class="container-fluid">
+        <div class="row justify-content-between">
+            <div class="col col-6 d-flex align-items-center mb-3">
+                <h1 class="text-dark font-bold"><?php echo __('Conteúdos') ?></h1>
+            </div>
+            
+            <div class="col-auto mb-3 justify-content-end">
+                <a href="javascript:;" id="add-conteudo" style="font-size: larger;" class="btn btn-2 btn-primary text-white btn-block px-4 py-2 me-3 text-nowrap"><?= __('Novo Conteúdo') ?></a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 mb-3">
+                <div class="card p-4" style="border-radius: 8px; min-height: calc(100vh - 380px);" >
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <div id="tabela-conteudos"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-4">
+                <nav>
+                    <ul class="pagination" id="pagination-links"></ul>
+                </nav>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
 <script>
     $(document).ready(function(){
@@ -28,8 +48,8 @@
                     },
                     success: function(response){
                         if(response.success){
-                            var html = '<table>';
-                            html += '<tr><th>ID</th><th>Playlist</th><th>Título</th><th>URL</th><th>Autor</th><th>Data de criação</th><th>Última atualização</th><th>Ações</th></tr>';
+                            var html = '<table class="table">';
+                            html += '<tr class="table-dark"><th>ID</th><th>Playlist</th><th>Título</th><th>URL</th><th>Autor</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr>';
                             response.data.forEach(function(conteudo) {
                                 html += '<tr>';
                                 html += '<td>' + conteudo.id + '</td>';
@@ -37,9 +57,9 @@
                                 html += '<td>' + conteudo.title + '</td>';
                                 html += '<td>' + conteudo.url + '</td>';
                                 html += '<td>' + conteudo.author + '</td>';
-                                html += '<td>' + conteudo.created_at + '</td>';
-                                html += '<td>' + conteudo.updated_at + '</td>';
-                                html += '<td><a href="javascript:;" class="btn btn-primary view-conteudo mx-1" data-conteudo-id="' + conteudo.id + '">' + 'Visualizar</a>'
+                                html += '<td class="text-center">' + conteudo.created_at + '</td>';
+                                html += '<td class="text-center">' + conteudo.updated_at + '</td>';
+                                html += '<td class="text-center"><a href="javascript:;" class="btn btn-primary view-conteudo mx-1" data-conteudo-id="' + conteudo.id + '">' + 'Visualizar</a>'
                                     + '<a href="javascript:;" class="btn btn-secondary edit-conteudo mx-1" data-conteudo-id="' + conteudo.id + '">' + 'Editar</a>'
                                     + '<a href="javascript:;" class="btn btn-danger delete-conteudo mx-1" data-conteudo-id="' + conteudo.id + '">' + 'Excluir</a>'
                                     + '</td>';
