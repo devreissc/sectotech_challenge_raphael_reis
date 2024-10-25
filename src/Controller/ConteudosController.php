@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+
+use Cake\Datasource\Exception\RecordNotFoundException;
+
 class ConteudosController extends AppController
 {
     public function index(){}
@@ -17,8 +20,13 @@ class ConteudosController extends AppController
 
     public function view($id = null)
     {
-        $conteudo = $this->Conteudos->get($id, contain: ['Playlists']);
-        $this->set(compact('conteudo'));
+        try {
+            $conteudo = $this->Conteudos->get($id, contain: ['Playlists']);
+            $this->set(compact('conteudo'));
+        }catch (RecordNotFoundException $e) {
+            $this->Flash->error(__('O conteúdo não foi encontrado.'));
+            return $this->redirect(['action' => 'index']);
+        }
     }
 
     public function getConteudo($id = null){

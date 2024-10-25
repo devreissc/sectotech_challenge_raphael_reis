@@ -5,7 +5,7 @@
                 <div class="card p-4" style="border-radius: 8px; min-height: calc(100vh - 380px);" >
                     <div class="row d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 px-4 mb-4 border-bottom">
                         <div class="col-md-3 mb-2 mb-md-0">
-                            <span class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis fs-2"><?= h($playlist->title) ?></span>
+                            <span class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis fs-2"><?=__('Título: ') .  h($playlist->title) ?></span>
                         </div>
                         <div class="col-auto col-md-auto mb-2 justify-content-center mb-md-0">
                             <a href="javascript:;" class="btn btn-secondary edit-playlist mx-1 text-right fs-4" data-playlist-id="<?= h($playlist->id) ?>">Editar</a>
@@ -13,16 +13,17 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-lg-4 col-xxl-4 col-md-12 col-sm-12 table-responsive p-4">
                             <table>
-                                <tr>
-                                    <th><?= __('Título') ?></th>
-                                    <td><?= h($playlist->title) ?></td>
-                                </tr>
                                 <tr>
                                     <th><?= __('Id') ?></th>
                                     <td><?= $this->Number->format($playlist->id) ?></td>
                                 </tr>
+                                <tr>
+                                    <th><?= __('Título') ?></th>
+                                    <td><?= h($playlist->title) ?></td>
+                                </tr>
+                                
                                 <tr>
                                     <th><?= __('Descrição') ?></th>
                                     <td><?= h($playlist->description) ?></td>
@@ -41,7 +42,7 @@
                                 </tr>
                             </table>
                         </div>
-                        <div class="col-8" >
+                        <div class="col-lg-8 col-xxl-8 col-md-12 col-sm-12  p-4" >
                             <p class="d-flex align-items-center mb-md-4 me-md-auto link-body-emphasis fs-3"><?= __('Conteúdo relacionados') ?></p>
                             <?php if (!empty($playlist->conteudos)) : ?>
                                 <div class="table-responsive">
@@ -84,3 +85,8 @@
         </div>
     </div>
 </section>
+
+<?php echo $this->element('scripts/playlistIndexScript') ?>
+<?php echo $this->element('modais/modal_edit_playlist'); ?>
+<?php echo $this->element('scripts/conteudoIndexScript') ?>
+<?php echo $this->element('modais/modal_edit_conteudo'); ?>

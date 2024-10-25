@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Cake\Datasource\Exception\RecordNotFoundException;
+
 class PlaylistsController extends AppController
 {
     public function index(){}
@@ -22,8 +24,15 @@ class PlaylistsController extends AppController
 
     public function view($id = null)
     {
-        $playlist = $this->Playlists->get($id, contain: ['Conteudos']);
-        $this->set(compact('playlist'));
+        try {
+            $playlist = $this->Playlists->get($id, contain: ['Conteudos']);
+            $this->set(compact('playlist'));
+        }catch (RecordNotFoundException $e) {
+            // Exibe uma mensagem de erro e redireciona o usuário
+            $this->Flash->error(__('A playlist não foi encontrada.'));
+            return $this->redirect(['action' => 'index']); // Redireciona para a lista de playlists
+        }
+        
     }
 
     public function add()
