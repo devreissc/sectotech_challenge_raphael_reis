@@ -28,14 +28,12 @@ class PlaylistsController extends AppController
     public function view($id = null)
     {
         try {
-            $playlist = $this->Playlists->get($id, contain: ['Conteudos']);
-            $this->set(compact('playlist'));
-        }catch (RecordNotFoundException $e) {
-            // Exibe uma mensagem de erro e redireciona o usuário
+            $playlist = $this->Playlists->get($id);
+            $this->set(compact('playlist', 'id'));
+        } catch (RecordNotFoundException $e) {
             $this->Flash->error(__('A playlist não foi encontrada.'));
-            return $this->redirect(['action' => 'index']); // Redireciona para a lista de playlists
+            return $this->redirect(['action' => 'index']);
         }
-        
     }
 
     public function add()
@@ -70,17 +68,15 @@ class PlaylistsController extends AppController
         return $this->response->withType('application/json')->withStringBody(json_encode($response));
     }
 
-    public function getPlaylist($id = null){
+    public function getPlaylist($id = null)
+    {
         $this->request->allowMethod(['get']);
         
-        $playlist = $this->Playlists->get($id);
-        
-        if($playlist){
-            return $this->response->withType('application/json')->withStringBody(json_encode([
-                'success' => true,
-                'data' => $playlist
-            ]));
-        }else{
+        try {
+            $playlist = $this->Playlists->get($id, ['contain' => ['Conteudos']]);
+            $this->set(compact('playlist'));
+            $this->viewBuilder()->setLayout('ajax'); // Define o layout como 'ajax' para evitar cabeçalhos e rodapés
+        } catch (RecordNotFoundException $e) {
             return $this->response->withStatus(404)->withType('application/json')->withStringBody(json_encode([
                 'success' => false,
                 'error' => 'Playlist não encontrada.'

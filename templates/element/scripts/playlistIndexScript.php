@@ -140,27 +140,9 @@
                     PlaylistIndex.getAllPlaylists(clickedPage); // Chama a função para carregar a página selecionada
                 });
 
-                $('.view-playlist').unbind().click(function(){
+                $('.view-playlist').unbind().click(function() {
                     var playlistId = $(this).data('playlist-id');
-                    $.ajax({
-                        url: '<?= $this->Url->build(['controller' => 'playlists', 'action' => 'getPlaylist']) ?>/'+playlistId,
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function(response){
-                            if(response.success){
-                                window.location.href = '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'view']) ?>/' + playlistId;
-                            }else{
-                                GlobalScript.showErrorMessage('Erro', 'Erro ao atualizar playlist.');
-                            }
-                        },
-                        error: function(jqXHR) {
-                            if (jqXHR.status === 404) {
-                                GlobalScript.showErrorMessage('Erro', 'Playlist não encontrada.');
-                            } else {
-                                GlobalScript.showErrorMessage('Erro', 'Erro ao carregar playlist.');
-                            }
-                        }
-                    });
+                    window.location.href = '<?= $this->Url->build(['controller' => 'Playlists', 'action' => 'view']) ?>/' + playlistId;
                 });
             },
             confirmOperation: function(modalTitle = '', url = '', data = [], functionTriggered = ''){
