@@ -137,8 +137,7 @@ class PlaylistsTable extends Table
         }else{
             return [
                 'success' => false,
-                'message' => 'Não foram encontradas playlists.',
-                'action' => 'reload'
+                'message' => 'Não foram encontradas playlists.'
             ];
         }
     }

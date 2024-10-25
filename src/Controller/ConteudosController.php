@@ -10,12 +10,18 @@ class ConteudosController extends AppController
 {
     public function index(){}
 
-    public function getAllConteudos($page = 1){
+    public function getAllConteudos($page = null){
         $this->autoRender = false; // Desativa o auto render
         $this->viewBuilder()->setLayout('ajax');
+        if($page == 0){
+            $page = 1;
+        }
 
-        $conteudos = $this->Conteudos->getAllConteudosAjax($page);
-        return $this->response->withType('application/json')->withStringBody(json_encode($conteudos));
+        if(!is_null($page)){
+            $conteudos = $this->Conteudos->getAllConteudosAjax($page);
+
+            return $this->response->withType('application/json')->withStringBody(json_encode($conteudos));
+        }
     }
 
     public function view($id = null)

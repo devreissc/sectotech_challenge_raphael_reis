@@ -127,6 +127,16 @@ class ConteudosTable extends Table
 
         $quantityConteudos = $this->find()->count();
         $totalPages = ceil($quantityConteudos / $limit);
+        $hasNextPage = false;
+        $hasPreviusPage = false;
+
+        if($page <= $totalPages && $page > 0){
+            $hasPreviusPage = true;
+        }
+
+        if($page > 0 && $page < $totalPages){
+            $hasNextPage = true;
+        }
         
         if(!empty($conteudos)){
             return [
@@ -134,8 +144,10 @@ class ConteudosTable extends Table
                 'message' => 'Conteúdos encontradas.',
                 'data' => $this->afterFindFunction($conteudos),
                 'pagination' => [
-                    'current_page' => $page,
-                    'pages' => $totalPages
+                    'current_page' => (int)$page,
+                    'pages' => $totalPages,
+                    'hasNextPage' => $hasNextPage,
+                    'hasPreviusPage' => $hasPreviusPage,
                 ]
             ];
         }else{

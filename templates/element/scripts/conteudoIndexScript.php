@@ -28,7 +28,8 @@
                     beforeSend: function () {
                     },
                     success: function(response){
-                        if(response.success){
+                        console.log(response);
+                        if(response.success && response.pagination.current_page <= response.pagination.pages){
                             var html = '<table class="table">';
                             html += '<tr class="table-dark"><th>ID</th><th>Playlist</th><th>Título</th><th>URL</th><th>Autor</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr>';
                             response.data.forEach(function(conteudo) {
@@ -48,20 +49,33 @@
                             });
                             html += '</table>';
 
-                            // Insere o HTML gerado na div
                             $('#tabela-conteudos').html(html);
 
+
+                            // Cria links de paginação
                             $('#pagination-links').empty();
                             var link = '';
-                            // Cria links de paginação
+                            if(response.pagination.hasPreviusPage && response.pagination.current_page > 1){
+                                link = '<li class="page-item"><a href="javascript:;" class="pagination-link page-link" data-page="' + (parseInt(response.pagination.current_page)-1) + '">' + '<' + '</a></li>';
+                                $('#pagination-links').append(link);
+                            }
+                            
                             for (var i = 1; i <= response.pagination.pages; i++) {
                                 link = '<li class="page-item ' + (response.pagination.current_page == i ? 'active' : '') + '"><a href="javascript:;" class="pagination-link page-link" data-page="' + i + '">' + i + '</a></li>';
                                 $('#pagination-links').append(link);
                             }
 
+                            if(response.pagination.hasNextPage && response.pagination.current_page < response.pagination.pages){
+                                link = '<li class="page-item"><a href="javascript:;" class="pagination-link page-link" data-page="' + (parseInt(response.pagination.current_page)+1) + '">' + '>' + '</a></li>';
+                                $('#pagination-links').append(link);
+                            }
+                            
+
                             ConteudosIndex.utilitarios();
-                        }else {
-                            $('#tabela-conteudos').html('<p>Nenhum conteúdo encontrado.</p>');
+
+
+                        }else{
+                            $('#tabela-conteudos').html('<p class="fs-4">Nenhum conteúdo encontrado.</p><a class="fs-4 btn btn-primary p-2" href="<?php echo $this->Url->build(['controller' => 'conteudos', 'action' => 'index']) ?>">Voltar para o início</a>');
                             $('#pagination-links').empty();
                         }
                     }
@@ -76,6 +90,10 @@
                 $('.pagination-link').off('click').on('click', function(event){
                     event.preventDefault(); // Evita o comportamento padrão do link
                     var clickedPage = $(this).data('page');
+
+                    if(clickedPage == 0){
+                        clickedPage = 1;
+                    }
 
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=' + clickedPage;
                     history.pushState({page: clickedPage}, '', newUrl);
