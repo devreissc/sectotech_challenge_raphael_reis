@@ -4,7 +4,6 @@
       <?php echo $this->Html->image('logo.png', ['alt' => 'Logo', 'width' => '80']) ?>
       <span class="fs-4">SectoTeca</span>
     </a>
-    
   </div>
   
   <ul class="nav col-auto col-md-auto mb-2 justify-content-center mb-md-0">

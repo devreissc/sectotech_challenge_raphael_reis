@@ -1,4 +1,4 @@
-<section class="">
+<section>
     <div class="container-fluid">
         <div class="row justify-content-between">
             <div class="col col-6 d-flex align-items-center mb-3">
@@ -52,7 +52,7 @@
                         if(response.success){
                             // Cria o HTML para exibir as playlists
                             var html = '<table class="table">';
-                            html += '<thead class="table-dark"><tr><th>ID</th><th>Título</th><th>Autor</th><th>Descrição</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr></thead>';
+                            html += '<thead class="table-dark"><tr><th>ID</th><th>Título</th><th>Autor</th><th>Descrição</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr></thead><tbody>';
                             response.data.forEach(function(playlist) {
                                 html += '<tr>';
                                 html += '<td>' + playlist.id + '</td>';
@@ -67,7 +67,7 @@
                                     + '</td>';
                                 html += '</tr>';
                             });
-                            html += '</table>';
+                            html += '</tbody></table>';
 
                             // Insere o HTML gerado na div
                             $('#tabela-playlists').html(html);
