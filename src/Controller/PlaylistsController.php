@@ -9,11 +9,14 @@ class PlaylistsController extends AppController
 {
     public function index(){}
 
-    public function getAllPlaylists($page = 0){
+    public function getAllPlaylists($page = null){
         $this->autoRender = false; // Desativa o auto render
         $this->viewBuilder()->setLayout('ajax');
 
-        if($page > 0){
+        if(!is_null($page)){
+            if($page == 0){
+                $page = 1;
+            }
             $playlists = $this->Playlists->getAllPlaylistsAjax($page);
             return $this->response->withType('application/json')->withStringBody(json_encode($playlists));
         }else{

@@ -110,21 +110,35 @@ class PlaylistsTable extends Table
         $playlists = $this->find()->limit($limit)->offset($offset);
         
         $quantityPlaylists = $this->find()->count();
-        
-        if(!empty($playlists)){
+        $totalPages = ceil($quantityPlaylists / $limit);
+        $hasNextPage = false;
+        $hasPreviusPage = false;
+
+        if($page <= $totalPages && $page > 0){
+            $hasPreviusPage = true;
+        }
+
+        if($page <= $totalPages && $page > 0 && $page < $totalPages){
+            $hasNextPage = true;
+        }
+
+        if(!empty($playlists) && $page <= $totalPages){
             return [
                 'success' => true,
                 'message' => 'Playlists encontradas.',
                 'data' => $this->afterFindFunction($playlists),
                 'pagination' => [
                     'current_page' => $page,
-                    'pages' => ceil($quantityPlaylists / $limit)
+                    'pages' => $totalPages,
+                    'hasNextPage' => $hasNextPage,
+                    'hasPreviusPage' => $hasPreviusPage,
                 ]
             ];
         }else{
             return [
                 'success' => false,
-                'message' => 'Não foram encontradas playlists.'
+                'message' => 'Não foram encontradas playlists.',
+                'action' => 'reload'
             ];
         }
     }

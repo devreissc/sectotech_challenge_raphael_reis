@@ -1,6 +1,6 @@
 <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-2 px-4 mb-4 border-bottom bg-white">
   <div class="col-md-3 mb-2 mb-md-0">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+    <a href="<?= $this->Url->build(['controller' => 'playlists', 'action' => 'index']) ?>" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
       <?php echo $this->Html->image('logo.png', ['alt' => 'Logo', 'width' => '80']) ?>
       <span class="fs-4">SectoTeca</span>
     </a>

@@ -30,7 +30,7 @@
                     },
                     success: function (response) {
                         if(response.success){
-                            // Cria o HTML para exibir as playlists
+
                             var html = '<table class="table">';
                             html += '<thead class="table-dark"><tr><th>ID</th><th>Título</th><th>Autor</th><th>Descrição</th><th class="text-center">Data de criação</th><th class="text-center">Última atualização</th><th class="text-center">Ações</th></tr></thead><tbody>';
                             response.data.forEach(function(playlist) {
@@ -49,20 +49,28 @@
                             });
                             html += '</tbody></table>';
 
-                            // Insere o HTML gerado na div
                             $('#tabela-playlists').html(html);
 
                             $('#pagination-links').empty();
+
+                            /* Código refente a paginação, primeiro verifica se possui uma página antes da atual, e se a página atual é maior do que 1 para gerar o botão para voltar a página anterior, para evitar de ir para a página 0 */
                             var link = '';
-                            // Cria links de paginação
+                            if(response.pagination.hasPreviusPage && response.pagination.current_page > 1){
+                                link = '<li class="page-item"><a href="javascript:;" class="pagination-link page-link" data-page="' + (parseInt(response.pagination.current_page)-1) + '">' + '<' + '</a></li>';
+                                $('#pagination-links').append(link);
+                            }
                             for (var i = 1; i <= response.pagination.pages; i++) {
                                 link = '<li class="page-item ' + (response.pagination.current_page == i ? 'active' : '') + '"><a href="javascript:;" class="pagination-link page-link" data-page="' + i + '">' + i + '</a></li>';
+                                $('#pagination-links').append(link);
+                            }
+                            if(response.pagination.hasNextPage && response.pagination.current_page < response.pagination.pages){
+                                link = '<li class="page-item"><a href="javascript:;" class="pagination-link page-link" data-page="' + (parseInt(response.pagination.current_page)+1) + '">' + '>' + '</a></li>';
                                 $('#pagination-links').append(link);
                             }
 
                             PlaylistIndex.utilitarios();
                         }else {
-                            $('#tabela-playlists').html('<p>Nenhuma playlist encontrada.</p>');
+                            $('#tabela-playlists').html('<p class="fs-4">Nenhuma playlist encontrada.</p><a class="fs-4 btn btn-primary p-2" href="<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'index']) ?>">Voltar para o início</a>');
                             $('#pagination-links').empty();
                         }
                     }
@@ -121,6 +129,10 @@
                 $('.pagination-link').off('click').on('click', function(event){
                     event.preventDefault(); // Evita o comportamento padrão do link
                     var clickedPage = $(this).data('page');
+
+                    if(clickedPage == 0){
+                        clickedPage = 1;
+                    }
 
                     const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?page=' + clickedPage;
                     history.pushState({page: clickedPage}, '', newUrl);

@@ -126,6 +126,7 @@ class ConteudosTable extends Table
         ])->contain(['Playlists'])->limit($limit)->offset($offset);
 
         $quantityConteudos = $this->find()->count();
+        $totalPages = ceil($quantityConteudos / $limit);
         
         if(!empty($conteudos)){
             return [
@@ -134,7 +135,7 @@ class ConteudosTable extends Table
                 'data' => $this->afterFindFunction($conteudos),
                 'pagination' => [
                     'current_page' => $page,
-                    'pages' => ceil($quantityConteudos / $limit)
+                    'pages' => $totalPages
                 ]
             ];
         }else{

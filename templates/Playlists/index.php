@@ -15,7 +15,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="table-responsive">
-                                <div id="tabela-playlists"></div>
+                                <div id="tabela-playlists" class="text-center"></div>
                             </div>
                         </div>
                     </div>
