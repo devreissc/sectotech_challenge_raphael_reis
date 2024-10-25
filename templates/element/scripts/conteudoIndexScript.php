@@ -12,10 +12,12 @@
 
                 if (pathParts.includes('view')) {
                     isView = true;
-                    ConteudosIndex.utilitarios();
+                    
                 } else {
                     ConteudosIndex.reloadConteudos();
                 }
+
+                ConteudosIndex.utilitarios();
             },
             getAllConteudos: function(page = 1){
                 $.ajax({

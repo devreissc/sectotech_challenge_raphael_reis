@@ -14,7 +14,7 @@
  * @var \App\View\AppView $this
  */
 
-$cakeDescription = 'CakePHP: the rapid development php framework';
+$description = 'SectoTeca';
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,10 +25,10 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <title>
-        <?= $cakeDescription ?>:
+        <?= $description ?>:
         <?= $this->fetch('title') ?>
     </title>
-    <?= $this->Html->meta('icon') ?>
+    <?= $this->Html->meta('icon', 'img/logo.png'); ?>
 
     <?= $this->Html->css(
         [

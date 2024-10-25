@@ -67,12 +67,12 @@
                                 link = '<li class="page-item"><a href="javascript:;" class="pagination-link page-link" data-page="' + (parseInt(response.pagination.current_page)+1) + '">' + '>' + '</a></li>';
                                 $('#pagination-links').append(link);
                             }
-
-                            PlaylistIndex.utilitarios();
                         }else {
                             $('#tabela-playlists').html('<p class="fs-4">Nenhuma playlist encontrada.</p><a class="fs-4 btn btn-primary p-2" href="<?php echo $this->Url->build(['controller' => 'playlists', 'action' => 'index']) ?>">Voltar para o início</a>');
                             $('#pagination-links').empty();
                         }
+
+                        PlaylistIndex.utilitarios();
                     }
                 });
             },
